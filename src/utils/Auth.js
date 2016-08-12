@@ -1,4 +1,4 @@
-const basicAuth = require('basic-auth');
+// const basicAuth = require('basic-auth');
 
 export function auth(req, res, next) {
   // function unauthorized(res) {
@@ -17,6 +17,6 @@ export function auth(req, res, next) {
   // } else {
   //   return unauthorized(res);
   // }
-
+  
   return next();
 }

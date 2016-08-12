@@ -1,15 +1,19 @@
 {
-  "name": "calendar-server",
+  "name": "ExpressiveCalendar",
   "version": "0.0.1",
-  "description": "",
+  "description": "Expressive calendar backend server",
   "main": "index.js",
+  "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "nodemon --exec npm run babel-node -- src/app.js | ./node_modules/.bin/bunyan",
+    "start": "npm run babel-node -- src/app.js",
     "babel-node": "./node_modules/.bin/babel-node",
-    "build": "./node_modules/.bin/babel -d lib/ src/",
-    "fixtures": "./node_modules/.bin/babel-node ./src/fixtures/fixtures.js"
+    "eslint-fix": "./node_modules/.bin/eslint --ignore-pattern='*.spec.js' --fix src/",
+    "fixtures": "./node_modules/.bin/babel-node ./src/fixtures/fixtures.js",
+    "build": "./node_modules/.bin/babel -d lib/ src/"
   },
-  "author": "",
+  "author": "shoegazerwithak",
   "license": "ISC",
   "dependencies": {
     "babel-plugin-transform-runtime": "^6.12.0",
@@ -34,6 +38,12 @@
   },
   "devDependencies": {
     "babel-cli": "^6.11.4",
-    "babel-preset-es2015": "^6.13.2"
+    "babel-eslint": "^6.1.2",
+    "babel-preset-es2015": "^6.13.2",
+    "eslint": "^3.2.0",
+    "eslint-config-airbnb": "^9.0.1",
+    "eslint-plugin-import": "^1.12.0",
+    "eslint-plugin-jsx-a11y": "^2.0.1",
+    "eslint-plugin-react": "^5.1.1"
   }
 }

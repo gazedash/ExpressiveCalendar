@@ -4,8 +4,8 @@ import * as EventRepository from '../repositories/EventRepository';
 import * as LogRepository from '../repositories/LogRepository';
 
 export {
-	UserRepository,
-	CalendarRepository,
-	EventRepository,
-	LogRepository,
-}
+  UserRepository,
+  CalendarRepository,
+  EventRepository,
+  LogRepository,
+};
