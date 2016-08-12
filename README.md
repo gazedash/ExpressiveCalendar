@@ -15,5 +15,5 @@ docker run -p 6603:3306 --name some-mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw -d
 
 Load fixtures
 ```
-./node_modules/.bin/babel-node src/fixtures/fixtures.js 
+npm run fixtures
 ```

@@ -11,7 +11,7 @@ export const User = sequelize.define('user', {
 	username: {
 		type: Sequelize.STRING,
 	},
-	name: {
+	firstname: {
 		type: Sequelize.STRING,
 	},
 	surname: {
@@ -68,7 +68,7 @@ export const Calendar = sequelize.define('calendar', {
 		type: Sequelize.STRING,
 	},
 	description: {
-		type: sequelize.STRING,
+		type: Sequelize.STRING,
 	},
 	type: {
 		type: Sequelize.STRING,
