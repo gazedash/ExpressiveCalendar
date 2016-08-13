@@ -13,6 +13,31 @@ export async function find(id) {
   const res = await Calendar.findOne({
     where: { id },
   });
+  
+  if (!res) {
+    return null;
+  }
+  return res;
+}
+
+export async function findBySlug(slug) {
+  const res = await Calendar.findOne({
+    where: { slug },
+  });
+  
+  if (!res) {
+    return null;
+  }
+  return res;
+}
+
+export async function findByUserIdAndType({userId, type}) {
+  const user = await UserRepository.find(userId);
+  const res = await Calendar.findAndCountAll({
+    include: [ user ],
+    where: {type},
+  });
+  
   if (!res) {
     return null;
   }
@@ -22,18 +47,15 @@ export async function find(id) {
 
 export async function create(calendar) {
   console.log('calendar: create');
-  
   const { name, type, slug } = calendar;
   
   if (!name || !type || !slug || !calendar) {
     return null;
   }
-  
   const res = await Calendar.create(calendar);
   if (!res) {
     return null;
   }
-  
   return res;
 }
 

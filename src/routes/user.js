@@ -1,9 +1,14 @@
 import Joi from 'joi';
 import { UserRepository } from '../repositories';
-import { USER_ENDPOINT } from '../config/endpoints';
+import {
+  USER_ENDPOINT,
+  USER_LOGIN_ENDPOINT,
+} from '../config/endpoints';
 import {
   USER_EMAIL_MIN_LENGTH,
   USER_EMAIL_MAX_LENGTH,
+  USER_USERNAME_MIN_LENGTH,
+  USER_USERNAME_MAX_LENGTH,
   USER_PASSWORD_MIN_LENGTH,
   USER_PASSWORD_MAX_LENGTH,
 } from '../config/rules';
@@ -11,19 +16,29 @@ import {
 export default (createRoute) => {
   createRoute({
     method: 'GET',
-    path: `${USER_ENDPOINT}/:email`,
+    path: `${USER_ENDPOINT}/:username`,
     auth: false,
     validation: {
       params: {
-        email: Joi.string()
-          .min(USER_EMAIL_MIN_LENGTH)
-          .max(USER_EMAIL_MAX_LENGTH)
-          .email().required(),
+        username: Joi.string()
+          .min(USER_USERNAME_MIN_LENGTH)
+          .max(USER_USERNAME_MAX_LENGTH)
+          .required(),
       },
     },
     async handler(req, res) {
-      const exists = await UserRepository.exists(req.params.email);
-      res.status(exists ? 200 : 404).json({ exists });
+      const user = await UserRepository.findByUsername(req.params.username);
+      
+      if (!user) {
+        res.status(404).json({
+          error: {
+            code: '404',
+            message: 'No such username',
+          }
+        });
+      } else {
+        res.status(200).json({ user });
+      }
     },
   });
   
@@ -32,13 +47,23 @@ export default (createRoute) => {
     path: `${USER_ENDPOINT}`,
     async handler(req, res) {
       const user = await UserRepository.find(req.query.id);
-      res.json(user);
+  
+      if (!user) {
+        res.status(400).json({
+          error: {
+            code: '403',
+            message: 'Not authorized',
+          }
+        });
+      } else {
+        res.json(user);
+      }
     },
   });
   
   createRoute({
     method: 'POST',
-    path: `${USER_ENDPOINT}`,
+    path: `${USER_LOGIN_ENDPOINT}`,
     auth: false,
     validation: {
       body: {
@@ -53,12 +78,12 @@ export default (createRoute) => {
       },
     },
     async handler(req, res) {
-      const user = await UserRepository.create(req.body);
+      const user = await UserRepository.findByEmail(req.body.email);
       if (!user) {
         res.status(400).json({});
       } else {
-        res.status(201).json(user);
+        res.status(200).json(user);
       }
     },
-  });
+  })
 };

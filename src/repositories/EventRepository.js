@@ -13,6 +13,31 @@ export async function find(id) {
   const res = await Event.findOne({
     where: { id },
   });
+  if (!res) {
+    return null;
+  }
+  
+  return res;
+}
+
+export async function findBySlug(slug) {
+  const res = await Event.findOne({
+    where: { slug },
+  });
+  
+  if (!res) {
+    return null;
+  }
+  
+  return res;
+}
+
+export async function findAllByCalendarId(id) {
+  const calendar = await CalendarRepository.find(id);
+  const res = await Event.findAndCountAll({
+    include: [ calendar ],
+    where: {type},
+  });
   
   if (!res) {
     return null;
