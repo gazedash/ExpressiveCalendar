@@ -7,6 +7,18 @@ import {
 } from '../config/rules';
 
 export default (createRoute) => {
+  // Get event index
+  createRoute({
+    method: 'GET',
+    path: `${EVENT_ENDPOINT}`,
+    auth: true,
+    async handler(req, res) {
+      const user = await EventRepository.find(req.query.id);
+      res.json(user);
+    },
+  });
+  
+  // Get event by slug
   createRoute({
     method: 'GET',
     path: `${EVENT_ENDPOINT}/:slug`,
@@ -25,19 +37,58 @@ export default (createRoute) => {
     },
   });
   
-  createRoute({
-    method: 'GET',
-    path: `${EVENT_ENDPOINT}`,
-    async handler(req, res) {
-      const user = await EventRepository.find(req.query.id);
-      res.json(user);
-    },
-  });
-  
+  // Create event
   createRoute({
     method: 'POST',
     path: `${EVENT_ENDPOINT}`,
-    auth: false,
+    auth: true,
+    validation: {
+      body: {
+        slug: Joi.string()
+          .min(EVENT_SLUG_MIN_LENGTH)
+          .max(EVENT_SLUG_MAX_LENGTH),
+        name: Joi.string()
+          .min(0)
+          .max(100),
+        week: Joi.string()
+          .min(0)
+          .max(5),
+        weekday: Joi.number()
+          .min(0)
+          .max(6),
+        time: Joi.string()
+          .min(3)
+          .max(5),
+        place: Joi.string()
+          .min(0)
+          .max(100),
+        isEven: Joi.boolean(),
+        duration: Joi.string()
+          .min(0)
+          .max(5),
+        leader: Joi.string()
+          .min(0)
+          .max(100),
+        message: Joi.string()
+          .min(0)
+          .max(500),
+      },
+    },
+    async handler(req, res) {
+      const user = await EventRepository.create(req.body);
+      if (!user) {
+        res.status(400).json({});
+      } else {
+        res.status(201).json(user);
+      }
+    },
+  });
+  
+  // Delete event by slug
+  createRoute({
+    method: 'DELETE',
+    path: `${EVENT_ENDPOINT}/:slug`,
+    auth: true,
     validation: {
       body: {
         slug: Joi.string()

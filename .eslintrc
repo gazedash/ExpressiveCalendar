@@ -7,7 +7,9 @@
     }
   },
   "rules": {
+    "react/require-extension": "off",
     "newline-per-chained-call": 0,
+    "generator-star-spacing": 0,
     "global-require": 0,
     "camelcase": 0,
     "no-console": 0,

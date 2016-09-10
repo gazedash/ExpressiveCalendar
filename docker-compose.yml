@@ -1,0 +1,24 @@
+version: '2'
+services:
+  web:
+    build: .
+    command: bash -c "cd /www/ExpressiveCalendar && npm run production"
+    ports:
+    - "8000:8000"
+    links:
+    - db
+    - redis
+    depends_on:
+    - db
+    - redis
+  db:
+    image: mysql
+    expose:
+    - "3306"
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: "calendar"
+  redis:
+    image: redis
+    expose:
+    - "6379"

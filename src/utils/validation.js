@@ -1,22 +1,50 @@
 import * as Joi from 'joi';
+import isEmpty from 'lodash/isEmpty';
 
-export function userConnect(data) {
-  const schema = Joi.object().keys({
-    id: Joi.string().min(10).max(100).required(),
-    sub_id: Joi.string().min(1).max(100).required(),
+function validate(payload, schema) {
+  return Joi.validate(payload, schema, {
+    convert: true,
+    abortEarly: false,
+    allowUnknown: true,
+    stripUnknown: true,
   });
-  
-  return Joi.validate(data, schema);
 }
 
-export function users(data) {
-  const schema = Joi.object().keys({
-    type: Joi.string().min(0).max(256).default(false),
-    userId: Joi.string().default(false),
-    sort: Joi.number().min(0).max(1).integer().default(1),
-    offset: Joi.number().min(0).max(100000).integer().default(0),
-    limit: Joi.number().min(1).max(1000).integer().default(100),
+function formatError(error) {
+  const details = {};
+  error.details.forEach((item) => {
+    details[item.path] = item.type;
   });
   
-  return Joi.validate(data, schema);
+  return details;
 }
+
+export default (schema) => {
+  const keys = Object.keys(schema);
+  
+  function validation(req, res, next) {
+    const errors = Object.create(null);
+    
+    keys.forEach((key) => {
+      const { error, value } = validate(req[key], schema[key]);
+      if (error) {
+        errors[key] = formatError(error);
+      } else {
+        req[key] = value;
+      }
+    });
+    
+    if (isEmpty(errors)) {
+      next();
+    } else {
+      res.status(400).json({
+        success: false,
+        code: 400,
+        message: 'Bad request',
+        errors,
+      });
+    }
+  }
+  
+  return validation;
+};

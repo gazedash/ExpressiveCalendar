@@ -3,7 +3,7 @@ import logger from './logger';
 import * as lt from '../enum/LogTypes';
 import * as UserRepository from '../repositories/UserRepository';
 import * as LogRepository from '../repositories/LogRepository';
-import { isJson } from './Helper';
+import { isJson } from './helper';
 
 // const fs = Promise.promisifyAll(require('fs'));
 

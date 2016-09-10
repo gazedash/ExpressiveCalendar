@@ -1,0 +1,15 @@
+language: generic
+before_install:
+  - openssl aes-256-cbc -K $encrypted_f2ccbbe823ed_key -iv $encrypted_f2ccbbe823ed_iv
+    -in deploy_rsa.enc -out deploy_rsa -d
+  - eval "$(ssh-agent -s)"
+  - chmod 600 deploy_rsa
+  - ssh-add deploy_rsa
+
+install:
+  - cd .. && tar -czvf yttrackbot.tar.gz yttrackbot
+  - ssh -oStrictHostKeyChecking=no root@46.101.100.248 'mkdir -p /var/project'
+  - scp -oStrictHostKeyChecking=no yttrackbot.tar.gz root@46.101.100.248:/var/project/yttrackbot.tar.gz
+  - ssh -oStrictHostKeyChecking=no root@46.101.100.248 'cd /var/project && tar -xvzf yttrackbot.tar.gz'
+  - ssh -oStrictHostKeyChecking=no root@46.101.100.248 'cd /var/project/yttrackbot && docker build -t yttrackbot .'
+  - ssh -oStrictHostKeyChecking=no root@46.101.100.248 'docker run -d yttrackbot bash -c "cd /www/yttrackbot/src && npm run start" && docker ps -a'

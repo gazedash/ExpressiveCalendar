@@ -2,11 +2,11 @@ import { Event } from '../model/entity';
 import { CalendarRepository } from './index';
 
 export async function exists(slug) {
-  const exists = await Event.findOne({
+  const isExist = await Event.findOne({
     where: { slug },
   });
-  console.log('event: exists', Boolean(exists));
-  return Boolean(exists);
+  console.log('event: isExist', Boolean(isExist));
+  return Boolean(isExist);
 }
 
 export async function find(id) {
@@ -16,7 +16,7 @@ export async function find(id) {
   if (!res) {
     return null;
   }
-  
+
   return res;
 }
 
@@ -24,43 +24,43 @@ export async function findBySlug(slug) {
   const res = await Event.findOne({
     where: { slug },
   });
-  
+
   if (!res) {
     return null;
   }
-  
+
   return res;
 }
 
 export async function findAllByCalendarId(id) {
   const calendar = await CalendarRepository.find(id);
   const res = await Event.findAndCountAll({
-    include: [ calendar ],
-    where: {type},
+    include: [calendar],
+    where: { id },
   });
-  
+
   if (!res) {
     return null;
   }
-  
+
   return res;
 }
 
 export async function create(event) {
   console.log('event: create');
   const { name, week, weekday } = event;
-  
+
   if (!name || !week || !weekday) {
     return null;
   }
-  
+
   const res = await Event.create(event);
-  
+
   console.log('res', !!res);
   if (!res) {
     return null;
   }
-  
+
   return res;
 }
 

@@ -1,6 +1,6 @@
 export const USER_ENDPOINT = '/api/users';
 export const USER_LOGIN_ENDPOINT = '/api/users/login';
-export const USER_REGISTER_ENDPOINT = '/api/users/registration';
+export const USER_REGISTER_ENDPOINT = '/api/users/register';
 export const USER_LOGOUT_ENDPOINT = '/api/users/logout';
 export const USER_PASSWORD_CHANGE_ENDPOINT = '/api/users/password/change';
 export const USER_PASSWORD_ACTIVATE_ENDPOINT = '/api/users/password/activate';
