@@ -31,7 +31,7 @@ export async function findByEmail(email) {
     return null;
   }
 
-  return res;
+  return res.dataValues;
 }
 
 export async function findByUsername(username) {
@@ -43,7 +43,7 @@ export async function findByUsername(username) {
     return null;
   }
 
-  return res;
+  return res.dataValues;
 }
 
 export async function findByFullName({ firstname, surname }) {
@@ -75,7 +75,7 @@ export async function create(user) {
   const { firstname, username, email, password } = user;
 
   if (!firstname || !username || !email || !password || !exists(email)) {
-    console.log('user: missing fields');
+    console.log('user: missing fields', user);
     return null;
   }
 

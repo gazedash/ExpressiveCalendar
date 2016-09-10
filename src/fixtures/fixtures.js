@@ -1,13 +1,13 @@
-import sequelize from '../config/database';
+import sequelize from '../utils/sequelize';
 import { UserRepository, CalendarRepository, EventRepository } from '../repositories';
 
 const dropDB = true;
 
-function load() {
+export function load() {
   const password = 'dsafd2321';
-  
+
   UserRepository.create({
-    name: 'John',
+    firstname: 'John',
     surname: 'Coul',
     email: 'john@example.com',
     username: 'Couljohn0000',
@@ -18,7 +18,7 @@ function load() {
       return UserRepository.authorize(email, password)
         .then(data => console.log('auth', !!data));
     });
-    
+
     return id;
   }).then(userId => {
     CalendarRepository.create({
@@ -33,7 +33,7 @@ function load() {
         const res = UserRepository.addCalendar(3, 1);
         console.log('res', res);
       });
-      
+
       return id;
     }).then(calId => {
       console.log('calId', calId);
@@ -45,11 +45,13 @@ function load() {
         const { id, name } = event;
         console.log('name', name);
         EventRepository.exists(name).then(() => EventRepository.addCalendar(id, calId));
-        
+
         return id;
       });
     });
   });
+
+  console.log("Fixtures have been loaded successfully");
 }
 
 sequelize

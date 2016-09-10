@@ -18,4 +18,8 @@ export default function () {
   });
 
   connection.end();
+
+  return new Promise(function(resolve) {
+      resolve("Connection ready");
+  });
 }

@@ -1,5 +1,5 @@
 import Sequelize from 'sequelize';
-import sequelize from '../config/database';
+import sequelize from '../utils/sequelize';
 // import * as lt from '../enum/LogTypes';
 
 export const User = sequelize.define('user', {
