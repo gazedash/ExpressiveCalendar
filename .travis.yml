@@ -9,8 +9,6 @@ env:
 - PROJECT=ExpressiveCalendar
 install:
 - cd .. && tar --exclude='./$PROJECT/git' -czvf $PROJECT.tar.gz $PROJECT
-- ssh -oStrictHostKeyChecking=no $MACHINE_ADDR 'mkdir -p /var/project'
 - scp -oStrictHostKeyChecking=no $PROJECT.tar.gz $MACHINE_ADDR:/var/project/$PROJECT.tar.gz
-- ssh -oStrictHostKeyChecking=no $MACHINE_ADDR "cd /var/project && tar -xvzf $PROJECT.tar.gz"
-- ssh -oStrictHostKeyChecking=no $MACHINE_ADDR "cd /www/$PROJECT && docker-compose  build"
-- ssh -oStrictHostKeyChecking=no $MACHINE_ADDR "docker-compose up -d"
+- ssh -oStrictHostKeyChecking=no $MACHINE_ADDR "mkdir -p /var/project; cd /var/project && tar -xvzf $PROJECT.tar.gz"
+- ssh -oStrictHostKeyChecking=no $MACHINE_ADDR "cd /var/project/$PROJECT && docker-compose build && docker-compose up -d"

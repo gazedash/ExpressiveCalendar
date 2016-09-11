@@ -5,7 +5,7 @@ import createDatabase from '../utils/db';
 const sequelize = new Sequelize(DB_URL);
 
 export function sequelizeConnect() {
-  createDatabase().then(function() {
+  createDatabase().then(() => {
     sequelize
       .authenticate()
       .then(() => {

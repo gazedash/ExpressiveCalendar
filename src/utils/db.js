@@ -19,7 +19,7 @@ export default function () {
 
   connection.end();
 
-  return new Promise(function(resolve) {
-      resolve("Connection ready");
+  return new Promise((resolve) => {
+    resolve('Connection ready');
   });
 }

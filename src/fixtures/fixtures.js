@@ -51,7 +51,7 @@ export function load() {
     });
   });
 
-  console.log("Fixtures have been loaded successfully");
+  console.log('Fixtures have been loaded successfully');
 }
 
 sequelize
