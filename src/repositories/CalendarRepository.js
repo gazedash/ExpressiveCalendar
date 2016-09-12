@@ -20,6 +20,19 @@ export async function find(id) {
   return res;
 }
 
+export async function findAll(userId) {
+  const user = await UserRepository.find(userId);
+  const res = await Calendar.findAll({
+    include: [user],
+    limit: 100,
+  });
+
+  if (!res) {
+    return null;
+  }
+  return res;
+}
+
 export async function findBySlug(slug) {
   const res = await Calendar.findOne({
     where: { slug },

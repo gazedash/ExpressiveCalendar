@@ -18,13 +18,14 @@ export default (createRoute) => {
   createRoute({
     method: 'GET',
     path: `${CALENDAR_ENDPOINT}`,
+    // TODO: refactor, smth is wrong ^
     async handler(req, res) {
       const user = await UserRepository.findByEmail(req.user.id);
-      const calendar = await CalendarRepository.findByUserIdAndType(user.id);
+      const calendar = await CalendarRepository.findAll(user.id);
       res.json(calendar);
     },
   });
-  
+
   // Get calendar by slug
   createRoute({
     method: 'GET',
@@ -44,7 +45,7 @@ export default (createRoute) => {
       res.status(calendar ? 200 : 404).json({ calendar });
     },
   });
-  
+
   // Create calendar
   createRoute({
     method: 'POST',
@@ -77,7 +78,7 @@ export default (createRoute) => {
       }
     },
   });
-  
+
   // Update calendar by slug
   createRoute({
     method: 'PUT',
@@ -116,7 +117,7 @@ export default (createRoute) => {
       }
     },
   });
-  
+
   // Delete calendar (from index)
   createRoute({
     method: 'DELETE',
@@ -134,7 +135,7 @@ export default (createRoute) => {
       res.json({});
     },
   });
-  
+
   // Delete calendar ( index)
   createRoute({
     method: 'DELETE',

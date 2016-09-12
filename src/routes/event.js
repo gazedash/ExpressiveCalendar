@@ -12,12 +12,13 @@ export default (createRoute) => {
     method: 'GET',
     path: `${EVENT_ENDPOINT}`,
     auth: true,
+    // TODO: calendar id
     async handler(req, res) {
-      const user = await EventRepository.find(req.query.id);
-      res.json(user);
+      const event = await EventRepository.findAll(req.query.id);
+      res.json(event);
     },
   });
-  
+
   // Get event by slug
   createRoute({
     method: 'GET',
@@ -36,7 +37,7 @@ export default (createRoute) => {
       res.status(exists ? 200 : 404).json({ exists });
     },
   });
-  
+
   // Create event
   createRoute({
     method: 'POST',
@@ -75,15 +76,15 @@ export default (createRoute) => {
       },
     },
     async handler(req, res) {
-      const user = await EventRepository.create(req.body);
-      if (!user) {
+      const event = await EventRepository.create(req.body);
+      if (!event) {
         res.status(400).json({});
       } else {
-        res.status(201).json(user);
+        res.status(201).json(event);
       }
     },
   });
-  
+
   // Delete event by slug
   createRoute({
     method: 'DELETE',
@@ -98,11 +99,11 @@ export default (createRoute) => {
       },
     },
     async handler(req, res) {
-      const user = await EventRepository.create(req.body);
-      if (!user) {
+      const event = await EventRepository.create(req.body);
+      if (!event) {
         res.status(400).json({});
       } else {
-        res.status(201).json(user);
+        res.status(201).json(event);
       }
     },
   });

@@ -32,11 +32,12 @@ export async function findBySlug(slug) {
   return res;
 }
 
-export async function findAllByCalendarId(id) {
-  const calendar = await CalendarRepository.find(id);
+export async function findAll(calId) {
+  const calendar = await CalendarRepository.find(calId);
   const res = await Event.findAndCountAll({
     include: [calendar],
-    where: { id },
+    // TODO: ???
+    // where: { calId },
   });
 
   if (!res) {
