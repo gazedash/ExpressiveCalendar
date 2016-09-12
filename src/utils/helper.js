@@ -6,6 +6,7 @@ export function isJson(str) {
   } catch (e) {
     return false;
   }
+
   return true;
 }
 

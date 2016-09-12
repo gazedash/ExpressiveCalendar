@@ -1,11 +1,11 @@
-import { Event } from '../model/entity';
+import { Event, Calendar } from '../model/entity';
 import { CalendarRepository } from './index';
 
 export async function exists(slug) {
   const isExist = await Event.findOne({
     where: { slug },
   });
-  console.log('event: isExist', Boolean(isExist));
+
   return Boolean(isExist);
 }
 
@@ -20,11 +20,10 @@ export async function find(id) {
   return res;
 }
 
-export async function findBySlug(slug) {
-  const res = await Event.findOne({
+export async function remove(slug) {
+  const res = await Event.destroy({
     where: { slug },
   });
-
   if (!res) {
     return null;
   }
@@ -32,14 +31,22 @@ export async function findBySlug(slug) {
   return res;
 }
 
-export async function findAll(calId) {
-  const calendar = await CalendarRepository.find(calId);
-  const res = await Event.findAndCountAll({
-    include: [calendar],
-    // TODO: ???
-    // where: { calId },
+export async function findBySlug(slug) {
+  const res = await Event.findOne({
+    where: { slug },
   });
+  if (!res) {
+    return null;
+  }
 
+  return res;
+}
+
+export async function findAllBySlug(slug) {
+  const res = await Event.findAndCountAll({
+    include: [{ model: Calendar, where: { slug }, attributes: ['slug'], through: { attributes: [] } }],
+    limit: 100,
+  });
   if (!res) {
     return null;
   }
@@ -49,15 +56,12 @@ export async function findAll(calId) {
 
 export async function create(event) {
   console.log('event: create');
-  const { name, week, weekday } = event;
-
-  if (!name || !week || !weekday) {
+  const { name, week, weekday, slug } = event;
+  const isExist = await exists(slug);
+  if (!name || !week || !weekday || isExist) {
     return null;
   }
-
   const res = await Event.create(event);
-
-  console.log('res', !!res);
   if (!res) {
     return null;
   }
@@ -72,5 +76,6 @@ export async function addCalendar(eventId, calId) {
   const calendar = await CalendarRepository.find(calId);
   console.log('event, cal', !!event, !!calendar);
   event.addCalendar(calendar);
+
   return event;
 }

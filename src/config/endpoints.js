@@ -10,5 +10,5 @@ export const USER_SOCIAL_LOGIN_ENDPOINT = '/api/users/social/login';
 export const USER_SOCIAL_LOGOUT_ENDPOINT = '/api/users/social/logout';
 export const USER_SOCIAL_DISCONNECT_ENDPOINT = '/api/users/social/disconnect';
 
-export const CALENDAR_ENDPOINT = '/api/calendars';
-export const EVENT_ENDPOINT = '/api/events';
+export const CALENDAR_ENDPOINT = '/api/calendar';
+export const EVENT_ENDPOINT = '/api/event';

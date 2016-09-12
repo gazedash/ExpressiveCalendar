@@ -3,7 +3,7 @@ import omit from 'lodash/omit';
 import { UserRepository } from '../repositories';
 import { sign } from '../utils/jwt';
 import { getToken } from '../utils/auth';
-import { hash } from '../utils/bcrypt';
+import { hash } from '../utils/crypto';
 import redis from '../redis';
 import {
   USER_ENDPOINT,
@@ -29,14 +29,26 @@ import {
   USER_TOKEN_BLACKLIST_TTL,
 } from '../config/rules';
 
+const Promise = require('bluebird');
+
+Promise.promisifyAll(redis);
+
 export default (createRoute) => {
   // Get authorized profile
   createRoute({
     method: 'GET',
     path: `${USER_ENDPOINT}`,
     auth: true,
+    validation: {
+      body: {
+        email: Joi.string()
+          .min(USER_EMAIL_MIN_LENGTH)
+          .max(USER_EMAIL_MAX_LENGTH)
+          .required(),
+      },
+    },
     async handler(req, res) {
-      const user = await UserRepository.find(req.query.id);
+      const user = await UserRepository.findByEmail(req.body.email);
       if (!user) {
         res.status(400).json({
           error: {
@@ -46,7 +58,7 @@ export default (createRoute) => {
           },
         });
       } else {
-        res.json(user);
+        res.json({ code: 200, success: true, payload: user });
       }
     },
   });
@@ -56,11 +68,19 @@ export default (createRoute) => {
     method: 'POST',
     path: `${USER_ENDPOINT}`,
     auth: true,
+    validation: {
+      body: {
+        email: Joi.string()
+          .min(USER_EMAIL_MIN_LENGTH)
+          .max(USER_EMAIL_MAX_LENGTH)
+          .required(),
+      },
+    },
     async handler(req, res) {
-      const user = await UserRepository.find(req.body.id);
+      const user = await UserRepository.findByEmail(req.body.email);
       console.log('!!user', !!user);
       if (!user) {
-        res.status(400).json({
+        res.status(403).json({
           error: {
             success: false,
             code: '403',
@@ -68,7 +88,7 @@ export default (createRoute) => {
           },
         });
       } else {
-        res.json(user);
+        res.json({ code: 200, success: true, payload: user });
       }
     },
   });
@@ -78,8 +98,16 @@ export default (createRoute) => {
     method: 'DELETE',
     path: `${USER_ENDPOINT}`,
     auth: true,
+    validation: {
+      body: {
+        email: Joi.string()
+          .min(USER_EMAIL_MIN_LENGTH)
+          .max(USER_EMAIL_MAX_LENGTH)
+          .required(),
+      },
+    },
     async handler(req, res) {
-      const user = await UserRepository.remove(req.body.id);
+      const user = await UserRepository.remove(req.body.email);
       console.log('!!user', !!user);
       if (!user) {
         res.status(400).json({
@@ -104,7 +132,7 @@ export default (createRoute) => {
     path: `${USER_ENDPOINT}/:username`,
     auth: false,
     validation: {
-      // how to determine that it's my account?
+      // TODO: how to determine that it's my account?
       params: {
         username: Joi.string()
           .min(USER_USERNAME_MIN_LENGTH)
@@ -123,7 +151,7 @@ export default (createRoute) => {
           },
         });
       } else {
-        res.status(200).json({ user: omit(user, 'password') });
+        res.status(200).json({ code: 200, success: true, payload: omit(user, 'password') });
       }
     },
   });
@@ -159,7 +187,7 @@ export default (createRoute) => {
         id: user.id,
         username: user.username,
       });
-      res.json({ token });
+      res.status(200).json({ code: 200, success: true, token });
     },
   });
 
@@ -182,14 +210,20 @@ export default (createRoute) => {
     },
     async handler(req, res) {
       const token = getToken(req);
-      const hashToken = hash(token);
-      const day = new Date().getDay();
-      const category = `blacklist${day}`;
-      redis.sadd(category, hashToken);
-      if (redis.pttl(category) === -1) {
-        redis.pexpire(category, USER_TOKEN_BLACKLIST_TTL);
+      if (token) {
+        const hashToken = hash(token);
+        const day = new Date().getDay();
+        const category = `blacklist${day}`;
+        redis.sadd(category, hashToken);
+        redis.pttlAsync(category).then(result => {
+          if (result === -1) {
+            // Set TTL in milliseconds
+            redis.pexpire(category, USER_TOKEN_BLACKLIST_TTL);
+          }
+        });
+        res.status(200).json({ success: true, code: 200, message: 'Successful logout' });
       }
-      res.status(200).json({ success: true, code: 200, message: 'Successful logout' });
+      res.status(400).json({ success: false, code: 400, message: 'Token is missing' });
     },
   });
 
@@ -200,6 +234,7 @@ export default (createRoute) => {
     auth: false,
     validation: {
       body: {
+        // TODO: default cases
         email: Joi.string()
           .min(USER_EMAIL_MIN_LENGTH)
           .max(USER_EMAIL_MAX_LENGTH)
@@ -244,7 +279,7 @@ export default (createRoute) => {
         });
       } else {
         // res.status(200).json(user);
-        res.status(200).json({ token });
+        res.status(200).json({ code: 200, success: true, token, payload: omit(user, 'password') });
       }
     },
   });

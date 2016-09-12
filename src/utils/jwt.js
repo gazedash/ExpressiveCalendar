@@ -1,7 +1,7 @@
+import { SECRET } from '../config/constant';
+
 const Promise = require('bluebird');
 const jwt = Promise.promisifyAll(require('jsonwebtoken'));
-
-const SECRET = 'calendar_secret';
 
 export function verify(token) {
   return jwt.verifyAsync(token, SECRET, {

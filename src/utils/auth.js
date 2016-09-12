@@ -1,8 +1,10 @@
 import _ from 'lodash';
 import { verify } from '../utils/jwt';
-import { hash } from '../utils/bcrypt';
+import { hash } from '../utils/crypto';
 import { UserRepository } from '../repositories';
 import redis from '../redis';
+
+const Promise = require('bluebird');
 
 export function getToken(req) {
   if (req.headers.authorization) {
@@ -19,6 +21,13 @@ export function getToken(req) {
   return null;
 }
 
+function isBlacklisted(hashToken) {
+  const blacklistChecks = _.range(7).map((day) => {
+    return redis.sismemberAsync(`blacklist${day}`, hashToken);
+  });
+  return Promise.all(blacklistChecks);
+}
+
 export default () => {
   return function auth(req, res, next) {
     const token = getToken(req);
@@ -29,22 +38,26 @@ export default () => {
       })));
     }
     verify(token).then(
-      (payload) => UserRepository.find(payload.id),
+      () => UserRepository.findByEmail(req.headers.email),
       () => {
         return next(res.status(401).json({
           success: false, code: 401, message: 'Malformed token',
         }));
       }
     ).then((user) => {
-      const isBlacklisted = !!(_.max(_.range(7).map((day) => {
-        const hashToken = hash(token);
-        return redis.sismember(`blacklist${day}`, hashToken);
-      })));
-      if (user && !isBlacklisted) {
-        req.user = user;
-        return next(res.status(200).json({ success: true, code: 200, message: 'Continue' }));
-      }
-      return next(res.status(403).json({ success: false, code: 403, message: 'Blacklisted token' }));
+      const hashToken = hash(token);
+      return isBlacklisted(hashToken).then((result) => {
+        if (user && !_.max(result)) {
+          req.user = user;
+          return next();
+        }
+
+        return next(res.status(403).json({
+          success: false,
+          code: 403,
+          message: 'Blacklisted token',
+        }));
+      });
     }).catch(next);
   };
 };

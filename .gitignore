@@ -41,3 +41,4 @@ jspm_packages
 !/assets/.gitkeep
 /assets/*
 
+deploy_rsa.pub

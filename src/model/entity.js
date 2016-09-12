@@ -75,6 +75,7 @@ export const Calendar = sequelize.define('calendar', {
   },
   slug: {
     type: Sequelize.STRING,
+    unique: true,
   },
   privacy: {
     type: Sequelize.INTEGER,
@@ -95,6 +96,7 @@ export const Event = sequelize.define('event', {
   },
   slug: {
     type: Sequelize.STRING,
+    unique: true,
   },
   week: {
     type: Sequelize.STRING,

@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { CalendarRepository, UserRepository } from '../repositories';
+import { CalendarRepository, EventRepository } from '../repositories';
 import { CALENDAR_ENDPOINT } from '../config/endpoints';
 import {
   CALENDAR_SLUG_MIN_LENGTH,
@@ -20,9 +20,11 @@ export default (createRoute) => {
     path: `${CALENDAR_ENDPOINT}`,
     // TODO: refactor, smth is wrong ^
     async handler(req, res) {
-      const user = await UserRepository.findByEmail(req.user.id);
-      const calendar = await CalendarRepository.findAll(user.id);
-      res.json(calendar);
+      const calendars = await CalendarRepository.findAll(req.headers.email);
+      if (!calendars) {
+        res.status(400).json({ code: 400, success: false, message: 'No calendars found by slug' });
+      }
+      res.status(200).json({ code: 200, success: true, payload: calendars });
     },
   });
 
@@ -41,8 +43,11 @@ export default (createRoute) => {
     },
     async handler(req, res) {
       // TODO: add private levels handling
-      const calendar = await CalendarRepository.findBySlug(req.params.slug);
-      res.status(calendar ? 200 : 404).json({ calendar });
+      const events = await EventRepository.findAllBySlug(req.params.slug);
+      if (!events) {
+        res.status(400).json({ code: 400, success: false, message: 'No events found by slug' });
+      }
+      res.status(200).json({ code: 200, success: true, payload: events });
     },
   });
 
@@ -52,6 +57,7 @@ export default (createRoute) => {
     path: `${CALENDAR_ENDPOINT}`,
     validation: {
       body: {
+        // TODO: default cases
         slug: Joi.string()
           .min(CALENDAR_SLUG_MIN_LENGTH)
           .max(CALENDAR_SLUG_MAX_LENGTH),
@@ -72,10 +78,9 @@ export default (createRoute) => {
     async handler(req, res) {
       const calendar = await CalendarRepository.create(req.body);
       if (!calendar) {
-        res.status(400).json({});
-      } else {
-        res.status(201).json({ calendar });
+        res.status(400).json({ code: 400, success: false, message: 'Required fields missing' });
       }
+      res.status(200).json({ code: 200, success: true, payload: calendar });
     },
   });
 
@@ -111,10 +116,9 @@ export default (createRoute) => {
     async handler(req, res) {
       const calendar = await CalendarRepository.update(req.body);
       if (!calendar) {
-        res.status(400).json({});
-      } else {
-        res.status(201).json({ calendar });
+        res.status(400).json({ code: 400, success: false, message: 'Required fields missing' });
       }
+      res.status(200).json({ code: 200, success: true, payload: calendar });
     },
   });
 
@@ -131,12 +135,15 @@ export default (createRoute) => {
       },
     },
     async handler(req, res) {
-      await CalendarRepository.remove(req.body.slug);
-      res.json({});
+      const calendar = await CalendarRepository.remove(req.body.slug);
+      if (!calendar) {
+        res.status(400).json({ code: 400, success: false, message: 'Calendar not found' });
+      }
+      res.status(200).json({ code: 200, success: true, message: 'Calendar deleted' });
     },
   });
 
-  // Delete calendar ( index)
+  // Delete calendar (by slug)
   createRoute({
     method: 'DELETE',
     path: `${CALENDAR_ENDPOINT}/:slug`,
@@ -149,8 +156,11 @@ export default (createRoute) => {
       },
     },
     async handler(req, res) {
-      await CalendarRepository.remove(req.params.slug);
-      res.json({});
+      const calendar = await CalendarRepository.remove(req.params.slug);
+      if (!calendar) {
+        res.status(400).json({ code: 400, success: false, message: 'Calendar not found' });
+      }
+      res.status(200).json({ code: 200, success: true, message: 'Calendar deleted' });
     },
   });
 };

@@ -7,18 +7,6 @@ import {
 } from '../config/rules';
 
 export default (createRoute) => {
-  // Get event index
-  createRoute({
-    method: 'GET',
-    path: `${EVENT_ENDPOINT}`,
-    auth: true,
-    // TODO: calendar id
-    async handler(req, res) {
-      const event = await EventRepository.findAll(req.query.id);
-      res.json(event);
-    },
-  });
-
   // Get event by slug
   createRoute({
     method: 'GET',
@@ -33,8 +21,9 @@ export default (createRoute) => {
       },
     },
     async handler(req, res) {
-      const exists = await EventRepository.exists(req.params.slug);
-      res.status(exists ? 200 : 404).json({ exists });
+      const event = await EventRepository.find(req.params.slug);
+      // TODO: fix response
+      res.status(event ? 200 : 404).json({ code: 200, success: true, payload: event });
     },
   });
 
@@ -45,6 +34,7 @@ export default (createRoute) => {
     auth: true,
     validation: {
       body: {
+        // TODO: default cases
         slug: Joi.string()
           .min(EVENT_SLUG_MIN_LENGTH)
           .max(EVENT_SLUG_MAX_LENGTH),
@@ -78,10 +68,9 @@ export default (createRoute) => {
     async handler(req, res) {
       const event = await EventRepository.create(req.body);
       if (!event) {
-        res.status(400).json({});
-      } else {
-        res.status(201).json(event);
+        res.status(400).json({ code: 400, success: false, message: 'Requirements are not met' });
       }
+      res.status(200).json({ code: 200, success: true, payload: event });
     },
   });
 
@@ -101,10 +90,10 @@ export default (createRoute) => {
     async handler(req, res) {
       const event = await EventRepository.create(req.body);
       if (!event) {
+        // TODO: fix 400 response
         res.status(400).json({});
-      } else {
-        res.status(201).json(event);
       }
+      res.status(200).json({ code: 200, success: true, payload: event });
     },
   });
 };

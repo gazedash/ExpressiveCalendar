@@ -7,3 +7,4 @@ export const DB_URL = 'mysql://root@db:3306/calendar';
 export const MYSQL_PASSWORD = 'my-secret-pw';
 export const MYSQL_DB = 'calendar';
 export const DB_DIALECT = 'mysql';
+export const SECRET = 'calendar_secret';
