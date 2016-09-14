@@ -42,6 +42,7 @@ export function load() {
           for (let k = 0; k < 10; k++) {
             EventRepository.create({
               name: 'study' + k,
+              slug: 'study' + k,
               week: 'study',
               weekday: 3,
             }, calId).then((event) => {

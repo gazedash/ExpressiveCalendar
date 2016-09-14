@@ -23,7 +23,6 @@ export async function find(id) {
 }
 
 export async function findAll(email) {
-  // const user = await UserRepository.findByEmail(email);
   const res = await Calendar.findAll({
     include: [{ model: User, where: { email }, attributes: ['email'], through: { attributes: [] } }],
     limit: 100,

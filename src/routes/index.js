@@ -15,18 +15,18 @@ function attachRoutes(app) {
     if (options.auth !== false) {
       args.push(auth());
     }
-    
+
     if (options.validation) {
       args.push(validation(options.validation));
     }
-    
+
     args.push((req, res, next) => {
       options.handler(req, res).catch(next);
     });
-    
+
     app[method](...args);
   }
-  
+
   routes.forEach((route) => {
     route.default(createRoute);
   });

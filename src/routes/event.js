@@ -21,7 +21,7 @@ export default (createRoute) => {
       },
     },
     async handler(req, res) {
-      const event = await EventRepository.find(req.params.slug);
+      const event = await EventRepository.findBySlug(req.params.slug);
       // TODO: fix response
       res.status(event ? 200 : 404).json({ code: 200, success: true, payload: event });
     },

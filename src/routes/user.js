@@ -39,16 +39,8 @@ export default (createRoute) => {
     method: 'GET',
     path: `${USER_ENDPOINT}`,
     auth: true,
-    validation: {
-      body: {
-        email: Joi.string()
-          .min(USER_EMAIL_MIN_LENGTH)
-          .max(USER_EMAIL_MAX_LENGTH)
-          .required(),
-      },
-    },
     async handler(req, res) {
-      const user = await UserRepository.findByEmail(req.body.email);
+      const user = await UserRepository.findByEmail(req.user.email);
       if (!user) {
         res.status(400).json({
           error: {
@@ -68,16 +60,8 @@ export default (createRoute) => {
     method: 'POST',
     path: `${USER_ENDPOINT}`,
     auth: true,
-    validation: {
-      body: {
-        email: Joi.string()
-          .min(USER_EMAIL_MIN_LENGTH)
-          .max(USER_EMAIL_MAX_LENGTH)
-          .required(),
-      },
-    },
     async handler(req, res) {
-      const user = await UserRepository.findByEmail(req.body.email);
+      const user = await UserRepository.findByEmail(req.user.email);
       console.log('!!user', !!user);
       if (!user) {
         res.status(403).json({
@@ -98,16 +82,8 @@ export default (createRoute) => {
     method: 'DELETE',
     path: `${USER_ENDPOINT}`,
     auth: true,
-    validation: {
-      body: {
-        email: Joi.string()
-          .min(USER_EMAIL_MIN_LENGTH)
-          .max(USER_EMAIL_MAX_LENGTH)
-          .required(),
-      },
-    },
     async handler(req, res) {
-      const user = await UserRepository.remove(req.body.email);
+      const user = await UserRepository.remove(req.user.email);
       console.log('!!user', !!user);
       if (!user) {
         res.status(400).json({

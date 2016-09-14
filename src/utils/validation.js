@@ -15,16 +15,16 @@ function formatError(error) {
   error.details.forEach((item) => {
     details[item.path] = item.type;
   });
-  
+
   return details;
 }
 
 export default (schema) => {
   const keys = Object.keys(schema);
-  
+
   function validation(req, res, next) {
     const errors = Object.create(null);
-    
+
     keys.forEach((key) => {
       const { error, value } = validate(req[key], schema[key]);
       if (error) {
@@ -33,7 +33,7 @@ export default (schema) => {
         req[key] = value;
       }
     });
-    
+
     if (isEmpty(errors)) {
       next();
     } else {
@@ -45,6 +45,6 @@ export default (schema) => {
       });
     }
   }
-  
+
   return validation;
 };

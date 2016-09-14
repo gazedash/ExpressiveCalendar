@@ -13,7 +13,7 @@ function onError(error) {
 
 export async function taskHandler(data, connectionParams) {
   const { id } = connectionParams;
-  
+
   if (!isJson(data)) {
     onError({
       msg: 'task is not valid json',
@@ -22,18 +22,18 @@ export async function taskHandler(data, connectionParams) {
     });
     return false;
   }
-  
+
   const task = JSON.parse(data);
   // type
   const { result } = task;
-  
+
   const user = await UserRepository.findByUuid(id);
-  
+
   const log = await LogRepository.create({
     type: lt.USER_CONNECT,
     data: result,
   });
   await user.addLog(log);
-  
+
   return lt.USER_CONNECT;
 }

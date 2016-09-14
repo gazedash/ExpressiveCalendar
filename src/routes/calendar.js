@@ -20,9 +20,9 @@ export default (createRoute) => {
     path: `${CALENDAR_ENDPOINT}`,
     // TODO: refactor, smth is wrong ^
     async handler(req, res) {
-      const calendars = await CalendarRepository.findAll(req.headers.email);
+      const calendars = await CalendarRepository.findAll(req.user.email);
       if (!calendars) {
-        res.status(400).json({ code: 400, success: false, message: 'No calendars found by slug' });
+        res.status(400).json({ code: 400, success: false, message: 'No calendars found for this user' });
       }
       res.status(200).json({ code: 200, success: true, payload: calendars });
     },
