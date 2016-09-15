@@ -1,5 +1,5 @@
 import { Calendar, User } from '../model/entity';
-import { UserRepository } from './index';
+import { UserRepository, EventRepository } from './index';
 
 export async function exists(slug) {
   const isExist = await Calendar.findOne({
@@ -86,6 +86,17 @@ export async function addUser(calId, userId) {
   calendar.addUser(user);
 
   return calendar;
+}
+
+// add event to existing cal
+export async function addEvent(calId, eventId) {
+  console.log('calendar: add event');
+  const calendar = await find(calId);
+  const event = await EventRepository.find(eventId);
+  console.log('calendar, user', !!calendar, !!event);
+  calendar.addEvent(event);
+
+  return event;
 }
 
 export async function update(data) {

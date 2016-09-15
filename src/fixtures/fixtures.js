@@ -30,12 +30,7 @@ export function load() {
         }, userId).then((calendar) => {
           const { id, slug } = calendar;
           console.log('id, userId', id, userId);
-          CalendarRepository.exists(slug).then(() => CalendarRepository.addUser(id, userId));
-          UserRepository.find(userId).then(() => {
-            const res = UserRepository.addCalendar(3, 1);
-            console.log('res', res);
-          });
-
+          CalendarRepository.exists(slug).then(() => UserRepository.addCalendar(userId, j));
           return id;
         }).then(calId => {
           console.log('calId', calId);
@@ -48,7 +43,7 @@ export function load() {
             }, calId).then((event) => {
               const { id, name } = event;
               console.log('name', name);
-              EventRepository.exists(name).then(() => EventRepository.addCalendar(id, calId));
+              EventRepository.exists(name).then(() => CalendarRepository.addEvent(calId, id));
 
               return id;
             });
