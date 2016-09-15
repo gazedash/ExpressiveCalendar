@@ -101,7 +101,7 @@ export async function authorize(email, password) {
 
 // add cal to user
 export async function addCalendar(userId, calId) {
-  // TODO: find or create?
+  // TODO: 1find or create?
   console.log('user: add cal');
   const calendar = await CalendarRepository.find(calId);
   const user = await find(userId);
