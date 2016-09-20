@@ -23,22 +23,16 @@ export function getCurrentUrl({group, semester}) {
   return getUrl({group, potok, semester})
 }
 
-export function getGroupSchedule(group) {
-  // const schedule = getSchedule({group, semester}).then((data) => {
-  //   return data;
-  // });
-  const groupName = transliterate(group);
+export function getGroupScheduleFromCache(group) {
+  const groupName = transliterate(group).toLowerCase();
 
-  return Promise.any([
-    getSchedule({group, semester}),
-    redis.hgetAsync(groupName, 'data')
-  ]);
+  return redis.hgetAsync(groupName, 'data');
 }
 
 export function addGroupSchedule(group) {
   getSchedule({group, semester}).then((data) => {
     if (data) {
-      const groupName = transliterate(group);
+      const groupName = transliterate(group).toLowerCase();
 
       redis.sadd('group', groupName);
       redis.hgetAsync(groupName, 'hash').then((hashOld) => {

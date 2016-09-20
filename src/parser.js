@@ -1,14 +1,14 @@
 import cheerio from 'cheerio';
 import _ from 'lodash';
+import moment from 'moment';
 import { getCurrentUrl } from './utils/schedule';
 import { getContent } from './utils/helper';
-
-import moment from 'moment';
+import { latinToCyrillic } from "./utils/transliterate";
 import {
-  scheduleSelector,
-  scheduleTableSelector,
-  scheduleExamSelector,
-  evenWeekSelector,
+scheduleSelector,
+scheduleTableSelector,
+scheduleExamSelector,
+evenWeekSelector,
 } from './config/schedule';
 
 const group = 'КТбо1-5';
@@ -132,6 +132,10 @@ export function getSchedule({group, semester}) {
   if (!semester || semester !== 1 || semester !== 2) {
     semesterCopy = 1;
   }
-  const url = getCurrentUrl({group, semester: semesterCopy});
+  let groupCopy = group.substr(0,2).toUpperCase() + group.substr(2).toLowerCase();
+  if (group.match(/[A-Za-z]+[0-9]-[0-9]/)) {
+    groupCopy = latinToCyrillic(groupCopy);
+  }
+  const url = getCurrentUrl({group: groupCopy, semester: semesterCopy});
   return getContent(url).then((body) => getScheduleData(body));
 }
