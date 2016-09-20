@@ -12,7 +12,6 @@ import {
 } from './config/schedule';
 
 const group = 'КТбо1-5';
-const url = getCurrentUrl({ group, semester: 1 });
 
 export function getScheduleData(body) {
   const $ = cheerio.load(body, { decodeEntities: false });
@@ -136,12 +135,3 @@ export function getSchedule({group, semester}) {
   const url = getCurrentUrl({group, semester: semesterCopy});
   return getContent(url).then((body) => getScheduleData(body));
 }
-
-const x = getSchedule({group}).then((data) => {
-  return data;
-});
-
-x.then((data) => {
-  console.log(JSON.stringify(data));
-});
-console.log('cccccccccccccccccc');

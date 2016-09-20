@@ -12,6 +12,7 @@ export const USER_LOGOUT_ENDPOINT = '/api/users/logout';
 // export const USER_SOCIAL_DISCONNECT_ENDPOINT = '/api/users/social/disconnect';
 
 export const CALENDAR_ENDPOINT = '/api/calendar';
+export const GROUP_ENDPOINT = '/api/group';
 export const EVENT_ENDPOINT = '/api/event';
 
 export const SERVICE_ENDPOINT = 'http://asu.tti.sfedu.ru/Raspisanie/ShowRaspisanie.aspx';

@@ -24,3 +24,5 @@ export const CALENDAR_DESCRIPTION_MAX_LENGTH = 500;
 export const CALENDAR_PRIVACY_MAX_LEVEL = 3;
 export const EVENT_SLUG_MIN_LENGTH = 3;
 export const EVENT_SLUG_MAX_LENGTH = 90;
+export const GROUP_SLUG_MIN_LENGTH = 3;
+export const GROUP_SLUG_MAX_LENGTH = 10;

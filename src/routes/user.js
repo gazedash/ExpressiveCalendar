@@ -34,10 +34,6 @@ import {
 } from '../config/schedule'
 import { transliterate } from '../utils/transliterate';
 
-// const Promise = require('bluebird');
-
-// Promise.promisifyAll(redis);
-
 export default (createRoute) => {
   // Get authorized profile
   createRoute({
