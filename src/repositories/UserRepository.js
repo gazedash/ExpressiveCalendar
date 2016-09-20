@@ -67,9 +67,9 @@ export async function findAllByGroup(group) {
 
 
 export async function create(user) {
-  const { firstname, username, email, password } = user;
+  const { firstname, email, password } = user;
   const isExist = await exists(email);
-  if (!firstname || !username || !email || !password || isExist) {
+  if (!firstname || !email || !password || isExist) {
     console.log('user: missing fields', user);
     return null;
   }

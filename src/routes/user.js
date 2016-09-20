@@ -5,6 +5,7 @@ import { sign } from '../utils/jwt';
 import { getToken } from '../utils/auth';
 import { hash } from '../utils/crypto';
 import redis from '../redis';
+import {getSchedule} from '../parser';
 import {
   USER_ENDPOINT,
   USER_LOGIN_ENDPOINT,
@@ -28,10 +29,13 @@ import {
   USER_PASSWORD_MAX_LENGTH,
   USER_TOKEN_BLACKLIST_TTL,
 } from '../config/rules';
+import {
+  semester
+} from '../config/schedule'
 
-const Promise = require('bluebird');
+// const Promise = require('bluebird');
 
-Promise.promisifyAll(redis);
+// Promise.promisifyAll(redis);
 
 export default (createRoute) => {
   // Get authorized profile
@@ -244,6 +248,19 @@ export default (createRoute) => {
       const token = sign({
         id: user.id,
         username: user.username,
+      });
+      getSchedule({group: req.body.group, semester}).then((data) => {
+        if (data) {
+          redis.sadd('group', req.body.group);
+          redis.hgetAsync(req.body.group, 'hash').then((hashOld) => {
+            const dataJSON = JSON.stringify(data);
+            const hashNew = hash(dataJSON);
+
+            if (hashOld && hashOld !== hashNew) {
+              redis.hmset(req.body.group, 'hash', hashNew, 'data', dataJSON);
+            }
+          });
+        }
       });
       if (!user) {
         res.status(400).json({

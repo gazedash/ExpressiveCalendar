@@ -2,7 +2,7 @@ import cheerio from 'cheerio';
 import _ from 'lodash';
 import { getCurrentUrl } from './utils/schedule';
 import { getContent } from './utils/helper';
-import { hash } from './utils/crypto';
+
 import moment from 'moment';
 import {
   scheduleSelector,
@@ -14,7 +14,7 @@ import {
 const group = 'КТбо1-5';
 const url = getCurrentUrl({ group, semester: 1 });
 
-export function getSchedule(body) {
+export function getScheduleData(body) {
   const $ = cheerio.load(body, { decodeEntities: false });
   if ($(scheduleTableSelector).children('*').length) {
     $('*').each(function () {      // iterate over all elements
@@ -33,8 +33,8 @@ export function getSchedule(body) {
     function getData(rows) {
       if (rows) {
         if ($(rows[0]).length) {
-          const firstWeek = {};
-          const secondWeek = {};
+          const first = {};
+          const second = {};
           let dayCounter = 0;
           let currentEvenClass;
 
@@ -102,12 +102,12 @@ export function getSchedule(body) {
               const dayName = dayCounter === 6 ? 'sunday' :
                 moment.weekdays()[dayCounter + 1].toLowerCase();
 
-              firstWeek[dayName] = day;
-              secondWeek[dayName] = dayEven;
+              first[dayName] = day;
+              second[dayName] = dayEven;
             }
           }
 
-          return { firstWeek, secondWeek };
+          return { first, second };
         } else {
           return {};
         }
@@ -124,28 +124,24 @@ export function getSchedule(body) {
 
     return null;
   } else {
-    return null
+    return null;
   }
 }
 
-const c = getContent(url)
-  .then((body) => getSchedule(body))
-  .catch((err) => console.error(err));
+export function getSchedule({group, semester}) {
+  let semesterCopy = semester;
+  if (!semester || semester !== 1 || semester !== 2) {
+    semesterCopy = 1;
+  }
+  const url = getCurrentUrl({group, semester: semesterCopy});
+  return getContent(url).then((body) => getScheduleData(body));
+}
 
-// const c = getContent(url)
-//   .then((body) => {
-//     const x = getSchedule(body);
-//     console.log(x.secondWeek[5]);
-//   })
-//   .catch((err) => console.error(err));
+const x = getSchedule({group}).then((data) => {
+  return data;
+});
 
-// c.then((data) => {
-//   console.log(data.secondWeek[5]);
-// });
-
-c.then((data) => {
+x.then((data) => {
   console.log(JSON.stringify(data));
-  const x = hash(JSON.stringify(data));
-  // console.log(x);
 });
 console.log('cccccccccccccccccc');

@@ -35,6 +35,7 @@ export const User = sequelize.define('user', {
     type: Sequelize.STRING,
   },
 }, {
+  charset: 'utf8',
   freezeTableName: true,
 });
 
@@ -82,6 +83,9 @@ export const Calendar = sequelize.define('calendar', {
   privacy: {
     type: Sequelize.INTEGER,
   },
+}, {
+  charset: 'utf8',
+  freezeTableName: true,
 });
 
 User.belongsToMany(Calendar, { through: 'user_calendar', onDelete: 'cascade' });
@@ -108,7 +112,7 @@ export const Event = sequelize.define('event', {
     type: Sequelize.INTEGER,
   },
   classTimeIndex: {
-    type: sequelize.INTEGER,
+    type: Sequelize.INTEGER,
   },
   time: {
     type: Sequelize.STRING,
@@ -129,8 +133,9 @@ export const Event = sequelize.define('event', {
     type: Sequelize.STRING,
   },
 }, {
+  charset: 'utf8',
   freezeTableName: true,
-  timestamps: false,
+  // timestamps: false,
 });
 
 Event.belongsToMany(Calendar, { through: 'event_calendar' });
