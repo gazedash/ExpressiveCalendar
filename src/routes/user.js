@@ -32,6 +32,7 @@ import {
 import {
   semester
 } from '../config/schedule'
+import { transliterate } from '../utils/transliterate';
 
 // const Promise = require('bluebird');
 
@@ -193,6 +194,7 @@ export default (createRoute) => {
       if (token) {
         const hashToken = hash(token);
         const day = new Date().getDay();
+        // TODO: consider whitelists
         const category = `blacklist${day}`;
         redis.sadd(category, hashToken);
         redis.pttlAsync(category).then(result => {
@@ -214,7 +216,7 @@ export default (createRoute) => {
     auth: false,
     validation: {
       body: {
-        // TODO: default cases
+        // TODO: default cases, is exist
         email: Joi.string()
           .min(USER_EMAIL_MIN_LENGTH)
           .max(USER_EMAIL_MAX_LENGTH)
@@ -244,36 +246,48 @@ export default (createRoute) => {
       },
     },
     async handler(req, res) {
-      const user = await UserRepository.create(req.body);
-      const token = sign({
-        id: user.id,
-        username: user.username,
-      });
-      getSchedule({group: req.body.group, semester}).then((data) => {
-        if (data) {
-          redis.sadd('group', req.body.group);
-          redis.hgetAsync(req.body.group, 'hash').then((hashOld) => {
-            const dataJSON = JSON.stringify(data);
-            const hashNew = hash(dataJSON);
-
-            if (hashOld && hashOld !== hashNew) {
-              redis.hmset(req.body.group, 'hash', hashNew, 'data', dataJSON);
-            }
-          });
-        }
-      });
-      if (!user) {
-        res.status(400).json({
-          error: {
-            success: false,
-            code: '400',
-            message: 'Bad request',
-          },
+      const exist = await UserRepository.exists({email: req.body.email, username: req.body.username});
+      if (!exist) {
+        const user = await UserRepository.create(req.body);
+        const token = sign({
+          id: user.id,
+          username: user.username,
         });
-      } else {
-        // res.status(200).json(user);
-        res.status(200).json({ code: 200, success: true, token, payload: omit(user, 'password') });
+        getSchedule({group: req.body.group, semester}).then((data) => {
+          if (data) {
+            const groupName = transliterate(req.body.group);
+
+            redis.sadd('group', groupName);
+            redis.hgetAsync(groupName, 'hash').then((hashOld) => {
+              const dataJSON = JSON.stringify(data);
+              const hashNew = hash(dataJSON);
+
+              if (hashOld !== hashNew) {
+                redis.hmset(groupName, 'hash', hashNew, 'data', dataJSON);
+              }
+            });
+          }
+        });
+        if (!user) {
+          res.status(400).json({
+            error: {
+              success: false,
+              code: '400',
+              message: 'Bad request',
+            },
+          });
+        } else {
+          // res.status(200).json(user);
+          res.status(200).json({ code: 200, success: true, token, payload: omit(user, 'password') });
+        }
       }
+      res.status(400).json({
+        error: {
+          success: false,
+          code: '400',
+          message: 'User with such email or username already exist',
+        },
+      });
     },
   });
 };

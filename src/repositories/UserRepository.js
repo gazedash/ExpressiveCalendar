@@ -2,9 +2,27 @@ import { User } from '../model/entity';
 import { compare, hash } from '../utils/bcrypt';
 import { CalendarRepository } from './index';
 
-export async function exists(email) {
+export async function exists({email, username}) {
+  let where = { email };
+  if (username) {
+    where = {
+      $or: [
+        {
+          email: {
+            $like: email
+          }
+        },
+        {
+          username: {
+            $like: username
+          }
+        }
+      ]
+    };
+  }
+
   const isExist = await User.findOne({
-    where: { email },
+    where,
   });
 
   return Boolean(isExist);
