@@ -135,6 +135,7 @@ export default (createRoute) => {
       },
     },
     async handler(req, res) {
+      // TODO: check that cal is yours
       const calendar = await CalendarRepository.remove(req.body.slug);
       if (!calendar) {
         res.status(400).json({ code: 400, success: false, message: 'Calendar not found' });

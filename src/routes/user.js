@@ -222,15 +222,15 @@ export default (createRoute) => {
           .required(),
         username: Joi.string()
           .min(USER_USERNAME_MIN_LENGTH)
-          .max(USER_USERNAME_MAX_LENGTH)
-          .required(),
+          .max(USER_USERNAME_MAX_LENGTH),
         firstname: Joi.string()
           .min(USER_FIRSTNAME_MIN_LENGTH)
           .max(USER_FIRSTNAME_MAX_LENGTH)
           .required(),
         surname: Joi.string()
           .min(USER_SECONDNAME_MIN_LENGTH)
-          .max(USER_SECONDNAME_MAX_LENGTH),
+          .max(USER_SECONDNAME_MAX_LENGTH)
+          .required(),
         group: Joi.string()
           .min(USER_GROUP_MIN_LENGTH)
           .max(USER_GROUP_MAX_LENGTH),

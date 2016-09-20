@@ -10,6 +10,7 @@ export const User = sequelize.define('user', {
   },
   username: {
     type: Sequelize.STRING,
+    unique: true,
   },
   firstname: {
     type: Sequelize.STRING,
@@ -25,6 +26,7 @@ export const User = sequelize.define('user', {
   },
   email: {
     type: Sequelize.STRING,
+    unique: true,
   },
   password: {
     type: Sequelize.STRING,
@@ -98,11 +100,15 @@ export const Event = sequelize.define('event', {
     type: Sequelize.STRING,
     unique: true,
   },
+  // TODO: week interval
   week: {
     type: Sequelize.STRING,
   },
   weekday: {
     type: Sequelize.INTEGER,
+  },
+  classTimeIndex: {
+    type: sequelize.INTEGER,
   },
   time: {
     type: Sequelize.STRING,
