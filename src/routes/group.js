@@ -26,7 +26,7 @@ export default (createRoute) => {
       addGroupSchedule(req.params.group);
       return getGroupScheduleFromCache(req.params.group).then((cache) => {
         if (cache) {
-          return res.status(200).json({ code: 200, debugMsg: 'from cache', success: true, payload: cache });
+          return res.status(200).json({ code: 200, debugMsg: 'from cache', success: true, payload: JSON.parse(cache) });
         }
         return getSchedule({ group: req.params.group, semester }).then((data) => {
           if (data) {
