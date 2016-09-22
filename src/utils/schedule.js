@@ -33,22 +33,24 @@ export function getGroupScheduleFromCache(group) {
 }
 
 export function addGroupSchedule(group) {
-  getSchedule({ group, semester }).then((data) => {
-    if (data) {
-      let groupName = group;
+  if (group) {
+    getSchedule({ group, semester }).then((data) => {
+      if (data) {
+        let groupName = group;
 
-      if (!group.match(/[A-Za-z]+[0-9]-[0-9]/)) {
-        groupName = transliterate(group).toLowerCase();
-      }
-      redis.sadd('group', groupName);
-      redis.hgetAsync(groupName, 'hash').then((hashOld) => {
-        const dataJSON = JSON.stringify(data);
-        const hashNew = hash(dataJSON);
-
-        if (hashOld !== hashNew) {
-          redis.hmset(groupName, 'hash', hashNew, 'data', dataJSON);
+        if (!group.match(/[A-Za-z]+[0-9]-[0-9]/)) {
+          groupName = transliterate(group).toLowerCase();
         }
-      });
-    }
-  });
+        redis.sadd('group', groupName);
+        redis.hgetAsync(groupName, 'hash').then((hashOld) => {
+          const dataJSON = JSON.stringify(data);
+          const hashNew = hash(dataJSON);
+
+          if (hashOld !== hashNew) {
+            redis.hmset(groupName, 'hash', hashNew, 'data', dataJSON);
+          }
+        });
+      }
+    });
+  }
 }

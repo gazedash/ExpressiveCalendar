@@ -33,6 +33,7 @@ import {
   semester,
 } from '../config/schedule';
 import { transliterate } from '../utils/transliterate';
+import { addGroupSchedule } from "../utils/schedule";
 
 export default (createRoute) => {
   // Get authorized profile
@@ -249,21 +250,7 @@ export default (createRoute) => {
           id: user.id,
           username: user.username,
         });
-        getSchedule({ group: req.body.group, semester }).then((data) => {
-          if (data) {
-            const groupName = transliterate(req.body.group);
-
-            redis.sadd('group', groupName);
-            redis.hgetAsync(groupName, 'hash').then((hashOld) => {
-              const dataJSON = JSON.stringify(data);
-              const hashNew = hash(dataJSON);
-
-              if (hashOld !== hashNew) {
-                redis.hmset(groupName, 'hash', hashNew, 'data', dataJSON);
-              }
-            });
-          }
-        });
+        addGroupSchedule(req.body.group);
         if (!user) {
           res.status(400).json({
             error: {
