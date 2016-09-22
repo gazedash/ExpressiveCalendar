@@ -10,6 +10,7 @@ scheduleTableSelector,
 scheduleExamSelector,
 evenWeekSelector,
 } from './config/schedule';
+import { addGroupSchedule } from "./utils/schedule";
 
 // const group = 'КТбо1-5';
 
@@ -145,4 +146,4 @@ export function getSchedule({ group, semester }) {
 //   console.log(getScheduleData(body));
 // });
 
-getGroupScheduleFromCache('KTbo1-5');
+// getGroupScheduleFromCache('KTbo1-5');

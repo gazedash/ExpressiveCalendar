@@ -4,6 +4,7 @@ import { transliterate } from '../utils/transliterate';
 import { getSchedule } from '../parser';
 import redis from '../redis';
 import { hash } from '../utils/crypto';
+const Promise = require('bluebird');
 
 export function buildQuery({ group, potok, semester }) {
   const encGroup = encodeURIComponent(group);
