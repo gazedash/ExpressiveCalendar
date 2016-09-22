@@ -1,9 +1,9 @@
 import cheerio from 'cheerio';
 import _ from 'lodash';
 import moment from 'moment';
-import { getCurrentUrl } from './utils/schedule';
+import { getCurrentUrl, getGroupScheduleFromCache } from './utils/schedule';
 import { getContent } from './utils/helper';
-import { latinToCyrillic } from "./utils/transliterate";
+import { latinToCyrillic } from './utils/transliterate';
 import {
 scheduleSelector,
 scheduleTableSelector,
@@ -11,7 +11,7 @@ scheduleExamSelector,
 evenWeekSelector,
 } from './config/schedule';
 
-const group = 'КТбо1-5';
+// const group = 'КТбо1-5';
 
 export function getScheduleData(body) {
   const $ = cheerio.load(body, { decodeEntities: false });
@@ -26,8 +26,8 @@ export function getScheduleData(body) {
 
     const table = $(scheduleTableSelector);
     const tableExam = $(scheduleExamSelector);
-    const rows = table.length ? table.find("tr") : null;
-    const rowsExam = tableExam.length ? tableExam.find("tr") : null;
+    const rows = table.length ? table.find('tr') : null;
+    const rowsExam = tableExam.length ? tableExam.find('tr') : null;
 
     function getData(rows) {
       if (rows) {
@@ -40,12 +40,12 @@ export function getScheduleData(body) {
           for (let i = 2; i < rows.length; i++) {
             const current = rows[i];
             const next = rows[i + 1];
-            const classes = $(current).children("td");
-            const classesNext = $(next).children("td");
+            const classes = $(current).children('td');
+            const classesNext = $(next).children('td');
 
             if (i % 2 == 0) {
               const title = classes[0].children[0].data;
-              let day = {};
+              const day = {};
               if (title.indexOf('.') > -1) {
                 day.date = title;
               } else {
@@ -60,11 +60,11 @@ export function getScheduleData(body) {
 
               let evenClassCounter = 0;
               for (let j = 1; j < classes.length; j++) {
-                const timeInterval = $(rows[1]).children("td")[j].children[0].data;
+                const timeInterval = $(rows[1]).children('td')[j].children[0].data;
                 const currentClass = classes[j];
                 const currentClassElem = currentClass.children[0];
                 // flag that it is not even week
-                let isOdd = currentClass.attribs[evenWeekSelector] === undefined;
+                const isOdd = currentClass.attribs[evenWeekSelector] === undefined;
                 if (isOdd) {
                   currentEvenClass = j;
                   const nextClassElem = classesNext[evenClassCounter].children[0];
@@ -127,15 +127,22 @@ export function getScheduleData(body) {
   }
 }
 
-export function getSchedule({group, semester}) {
+export function getSchedule({ group, semester }) {
   let semesterCopy = semester;
   if (!semester || semester !== 1 || semester !== 2) {
     semesterCopy = 1;
   }
-  let groupCopy = group.substr(0,2).toUpperCase() + group.substr(2).toLowerCase();
+  let groupCopy = group.substr(0, 2).toUpperCase() + group.substr(2).toLowerCase();
   if (group.match(/[A-Za-z]+[0-9]-[0-9]/)) {
     groupCopy = latinToCyrillic(groupCopy);
   }
-  const url = getCurrentUrl({group: groupCopy, semester: semesterCopy});
+  const url = getCurrentUrl({ group: groupCopy, semester: semesterCopy });
   return getContent(url).then((body) => getScheduleData(body));
 }
+//
+// const url = getCurrentUrl({ group: 'КТбо1-5', semester: 1 });
+// getContent(url).then((body) => {
+//   console.log(getScheduleData(body));
+// });
+
+getGroupScheduleFromCache('KTbo1-5');

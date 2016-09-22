@@ -8,10 +8,10 @@ export function load() {
 
   for (let i = 0; i < 15; i++) {
     UserRepository.create({
-      firstname: 'admin' + i,
-      surname: 'admin' + i,
-      email: 'admin' + i + '@ya.ru',
-      username: 'admin' + i,
+      firstname: `admin${i}`,
+      surname: `admin${i}`,
+      email: `admin${i}@ya.ru`,
+      username: `admin${i}`,
       password,
     }).then(user => {
       const { id, email } = user;
@@ -24,9 +24,9 @@ export function load() {
     }).then(userId => {
       for (let j = 0; j < 10; j++) {
         CalendarRepository.create({
-          name: 'My ' + j + ' schedule',
+          name: `My ${j} schedule`,
           type: 'work',
-          slug: 'work' + j,
+          slug: `work${j}`,
         }, userId).then((calendar) => {
           const { id, slug } = calendar;
           console.log('id, userId', id, userId);
@@ -36,8 +36,8 @@ export function load() {
           console.log('calId', calId);
           for (let k = 0; k < 10; k++) {
             EventRepository.create({
-              name: 'study' + k,
-              slug: 'study' + k,
+              name: `study${k}`,
+              slug: `study${k}`,
               week: 'study',
               weekday: 3,
             }, calId).then((event) => {

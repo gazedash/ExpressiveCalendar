@@ -3,37 +3,42 @@ import { potok, semester } from '../config/schedule';
 import { transliterate } from '../utils/transliterate';
 import { getSchedule } from '../parser';
 import redis from '../redis';
-const Promise = require('bluebird');
+import { hash } from '../utils/crypto';
 
-export function buildQuery({group, potok, semester}) {
+export function buildQuery({ group, potok, semester }) {
   const encGroup = encodeURIComponent(group);
-  return 'Substance=' + encGroup + '&isPotok=' + potok + '&Semestr=' + semester;
+  return `Substance=${encGroup}&isPotok=${potok}&Semestr=${semester}`;
 }
 
 export function buildEndpoint(args) {
-  return SERVICE_ENDPOINT + '?' + args;
+  return `${SERVICE_ENDPOINT}?${args}`;
 }
 
-export function getUrl({group, potok, semester}) {
-  const query = buildQuery({group, potok, semester});
+export function getUrl({ group, potok, semester }) {
+  const query = buildQuery({ group, potok, semester });
   return buildEndpoint(query);
 }
 
-export function getCurrentUrl({group, semester}) {
-  return getUrl({group, potok, semester})
+export function getCurrentUrl({ group, semester }) {
+  return getUrl({ group, potok, semester });
 }
 
 export function getGroupScheduleFromCache(group) {
-  const groupName = transliterate(group).toLowerCase();
-
+  let groupName = group;
+  if (!group.match(/[A-Za-z]+[0-9]-[0-9]/)) {
+    groupName = transliterate(group).toLowerCase();
+  }
   return redis.hgetAsync(groupName, 'data');
 }
 
 export function addGroupSchedule(group) {
-  getSchedule({group, semester}).then((data) => {
+  getSchedule({ group, semester }).then((data) => {
     if (data) {
-      const groupName = transliterate(group).toLowerCase();
+      let groupName = group;
 
+      if (!group.match(/[A-Za-z]+[0-9]-[0-9]/)) {
+        groupName = transliterate(group).toLowerCase();
+      }
       redis.sadd('group', groupName);
       redis.hgetAsync(groupName, 'hash').then((hashOld) => {
         const dataJSON = JSON.stringify(data);

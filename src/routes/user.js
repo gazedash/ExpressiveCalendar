@@ -5,7 +5,7 @@ import { sign } from '../utils/jwt';
 import { getToken } from '../utils/auth';
 import { hash } from '../utils/crypto';
 import redis from '../redis';
-import {getSchedule} from '../parser';
+import { getSchedule } from '../parser';
 import {
   USER_ENDPOINT,
   USER_LOGIN_ENDPOINT,
@@ -30,8 +30,8 @@ import {
   USER_TOKEN_BLACKLIST_TTL,
 } from '../config/rules';
 import {
-  semester
-} from '../config/schedule'
+  semester,
+} from '../config/schedule';
 import { transliterate } from '../utils/transliterate';
 
 export default (createRoute) => {
@@ -242,14 +242,14 @@ export default (createRoute) => {
       },
     },
     async handler(req, res) {
-      const exist = await UserRepository.exists({email: req.body.email, username: req.body.username});
+      const exist = await UserRepository.exists({ email: req.body.email, username: req.body.username });
       if (!exist) {
         const user = await UserRepository.create(req.body);
         const token = sign({
           id: user.id,
           username: user.username,
         });
-        getSchedule({group: req.body.group, semester}).then((data) => {
+        getSchedule({ group: req.body.group, semester }).then((data) => {
           if (data) {
             const groupName = transliterate(req.body.group);
 

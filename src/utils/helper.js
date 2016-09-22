@@ -27,7 +27,7 @@ export function getContent(url) {
     const request = lib.get(url, (response) => {
       // handle http errors
       if (response.statusCode < 200 || response.statusCode > 299) {
-        reject(new Error('Failed to load page, status code: ' + response.statusCode));
+        reject(new Error(`Failed to load page, status code:${response.statusCode}`));
       }
       // temporary data holder
       const body = [];
@@ -37,6 +37,6 @@ export function getContent(url) {
       response.on('end', () => resolve(body.join('')));
     });
     // handle connection errors of the request
-    request.on('error', (err) => reject(err))
-  })
+    request.on('error', (err) => reject(err));
+  });
 }
