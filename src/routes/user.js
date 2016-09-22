@@ -5,7 +5,6 @@ import { sign } from '../utils/jwt';
 import { getToken } from '../utils/auth';
 import { hash } from '../utils/crypto';
 import redis from '../redis';
-import { getSchedule } from '../parser';
 import {
   USER_ENDPOINT,
   USER_LOGIN_ENDPOINT,
@@ -29,11 +28,7 @@ import {
   USER_PASSWORD_MAX_LENGTH,
   USER_TOKEN_BLACKLIST_TTL,
 } from '../config/rules';
-import {
-  semester,
-} from '../config/schedule';
-import { transliterate } from '../utils/transliterate';
-import { addGroupSchedule } from "../utils/schedule";
+import { addGroupSchedule } from '../utils/schedule';
 
 export default (createRoute) => {
   // Get authorized profile
@@ -165,7 +160,7 @@ export default (createRoute) => {
         id: user.id,
         username: user.username,
       });
-      res.status(200).json({ code: 200, success: true, token });
+      res.status(200).json({ code: 200, success: true, token, payload: omit(user, 'password') });
     },
   });
 

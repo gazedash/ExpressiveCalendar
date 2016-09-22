@@ -38,7 +38,7 @@ export default () => {
       })));
     }
     verify(token).then(
-      () => UserRepository.findByEmail(req.headers.email),
+      (payload) => UserRepository.find(payload.id),
       () => {
         return next(res.status(401).json({
           success: false, code: 401, message: 'Malformed token',

@@ -104,17 +104,25 @@ export const Event = sequelize.define('event', {
     type: Sequelize.STRING,
     unique: true,
   },
-  // TODO: week interval
+  weekInterval: {
+    type: Sequelize.STRING,
+  },
   week: {
     type: Sequelize.STRING,
   },
   weekday: {
     type: Sequelize.INTEGER,
   },
-  classTimeIndex: {
+  classIndex: {
     type: Sequelize.INTEGER,
   },
+  date: {
+    type: Sequelize.STRING,
+  },
   time: {
+    type: Sequelize.STRING,
+  },
+  duration: {
     type: Sequelize.STRING,
   },
   place: {
@@ -122,9 +130,6 @@ export const Event = sequelize.define('event', {
   },
   isEven: {
     type: Sequelize.BOOLEAN,
-  },
-  duration: {
-    type: Sequelize.STRING,
   },
   leader: {
     type: Sequelize.STRING,

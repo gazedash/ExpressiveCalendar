@@ -1,16 +1,16 @@
 import cheerio from 'cheerio';
 import _ from 'lodash';
 import moment from 'moment';
-import { getCurrentUrl, getGroupScheduleFromCache } from './utils/schedule';
+import { getCurrentUrl } from './utils/schedule';
 import { getContent } from './utils/helper';
-import { latinToCyrillic } from './utils/transliterate';
 import {
-scheduleSelector,
-scheduleTableSelector,
-scheduleExamSelector,
-evenWeekSelector,
+  scheduleSelector,
+  scheduleTableSelector,
+  scheduleExamSelector,
+  evenWeekSelector,
+  getSemester,
 } from './config/schedule';
-import { addGroupSchedule } from "./utils/schedule";
+import { latinToCyrillicGroupName } from './utils/transliterate';
 
 // const group = 'КТбо1-5';
 
@@ -36,7 +36,6 @@ export function getScheduleData(body) {
           const first = {};
           const second = {};
           let dayCounter = 0;
-          let currentEvenClass;
 
           for (let i = 2; i < rows.length; i++) {
             const current = rows[i];
@@ -44,7 +43,7 @@ export function getScheduleData(body) {
             const classes = $(current).children('td');
             const classesNext = $(next).children('td');
 
-            if (i % 2 == 0) {
+            if (i % 2 === 0) {
               const title = classes[0].children[0].data;
               const day = {};
               if (title.indexOf('.') > -1) {
@@ -67,7 +66,6 @@ export function getScheduleData(body) {
                 // flag that it is not even week
                 const isOdd = currentClass.attribs[evenWeekSelector] === undefined;
                 if (isOdd) {
-                  currentEvenClass = j;
                   const nextClassElem = classesNext[evenClassCounter].children[0];
                   if (currentClassElem) {
                     day.data.push({ index: j, event: currentClassElem.data, time: timeInterval });
@@ -109,34 +107,40 @@ export function getScheduleData(body) {
 
           return { first, second };
         } else {
-          return {};
+          return null;
         }
       } else {
-        return {};
+        return null;
       }
     }
 
     const schedule = getData(rows);
-    if (!_.isEmpty(schedule)) {
+
+    if (schedule) {
       schedule.exam = getData(rowsExam);
       return { schedule };
     }
 
     return null;
-  } else {
-    return null;
   }
+  return null;
+}
+
+export function correctGroupNameCase(group) {
+  if (group) {
+    return group.substr(0, 2).toUpperCase() + group.substr(2).toLowerCase();
+  }
+
+  return group;
 }
 
 export function getSchedule({ group, semester }) {
   let semesterCopy = semester;
   if (!semester || semester !== 1 || semester !== 2) {
-    semesterCopy = 1;
+    semesterCopy = getSemester();
   }
-  let groupCopy = group.substr(0, 2).toUpperCase() + group.substr(2).toLowerCase();
-  if (group.match(/[A-Za-z]+[0-9]-[0-9]/)) {
-    groupCopy = latinToCyrillic(groupCopy);
-  }
+  let groupCopy = correctGroupNameCase(group);
+  groupCopy = latinToCyrillicGroupName(groupCopy);
   const url = getCurrentUrl({ group: groupCopy, semester: semesterCopy });
   return getContent(url).then((body) => getScheduleData(body));
 }

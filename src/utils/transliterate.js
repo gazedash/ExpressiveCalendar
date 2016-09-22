@@ -131,8 +131,28 @@ export function transliterate(word) {
   }).join('');
 }
 
+export function transliterateGroupName(group) {
+  if (group) {
+    if (!group.match(/[A-Za-z]+[0-9]-[0-9]/)) {
+      return transliterate(group);
+    }
+  }
+
+  return group;
+}
+
 export function latinToCyrillic(word) {
   return word.split('').map((char) => {
     return charLatinToCyrillic[char] || char;
   }).join('');
+}
+
+export function latinToCyrillicGroupName(group) {
+  if (group) {
+    if (group.match(/[A-Za-z]+[0-9]-[0-9]/)) {
+      return latinToCyrillic(group);
+    }
+  }
+
+  return group;
 }
