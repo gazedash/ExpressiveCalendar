@@ -128,6 +128,7 @@ export const Event = sequelize.define('event', {
   place: {
     type: Sequelize.STRING,
   },
+  // TODO: enum (0, 1, 2): 0 for both, 1 for odd, 2 for even
   isEven: {
     type: Sequelize.BOOLEAN,
   },
@@ -136,6 +137,9 @@ export const Event = sequelize.define('event', {
   },
   message: {
     type: Sequelize.STRING,
+  },
+  privacy: {
+    type: Sequelize.INTEGER,
   },
 }, {
   charset: 'utf8',

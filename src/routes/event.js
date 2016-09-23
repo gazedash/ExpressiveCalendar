@@ -22,10 +22,14 @@ export default (createRoute) => {
     },
     async handler(req, res) {
       const event = await EventRepository.findBySlug(req.params.slug);
-      // TODO: fix response
-      res.status(event ? 200 : 404).json({ code: 200, success: true, payload: event });
+      if (event) {
+        res.status(200).json({ code: 200, success: true, payload: event });
+      }
+      res.status(404).json({ code: 404, success: false, message: 'Event not found' });
     },
   });
+
+  // TODO: update event
 
   // Create event
   createRoute({
@@ -34,7 +38,6 @@ export default (createRoute) => {
     auth: true,
     validation: {
       body: {
-        // TODO: default cases
         slug: Joi.string()
           .min(EVENT_SLUG_MIN_LENGTH)
           .max(EVENT_SLUG_MAX_LENGTH),
@@ -80,7 +83,7 @@ export default (createRoute) => {
     path: `${EVENT_ENDPOINT}/:slug`,
     auth: true,
     validation: {
-      body: {
+      params: {
         slug: Joi.string()
           .min(EVENT_SLUG_MIN_LENGTH)
           .max(EVENT_SLUG_MAX_LENGTH)
@@ -88,11 +91,11 @@ export default (createRoute) => {
       },
     },
     async handler(req, res) {
-      const event = await EventRepository.create(req.body);
+      const event = await EventRepository.findByUserIdAndSlug({ userId: req.user.id, slug: req.params.slug });
       if (!event) {
-        // TODO: fix 400 response
-        res.status(400).json({});
+        res.status(400).json({ code: 400, success: false, message: 'Event not found' });
       }
+      event.destroy();
       res.status(200).json({ code: 200, success: true, payload: event });
     },
   });

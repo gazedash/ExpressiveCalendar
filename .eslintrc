@@ -14,7 +14,7 @@
     "camelcase": 0,
     "no-console": 0,
     "no-underscore-dangle": 0,
-    "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
+    "no-plusplus": 0,
     "no-trailing-spaces": [
       "error",
       {

@@ -85,16 +85,20 @@ export async function findAllByGroup(group) {
 
 
 export async function create(user) {
-  const { firstname, email, password } = user;
+  const { firstname, email, password, username } = user;
   const isExist = await exists(email);
   if (!firstname || !email || !password || isExist) {
     console.log('user: missing fields', user);
     return null;
   }
+  if (!username) {
+
+  }
   const hashed = await hash(password);
   const res = await User.create({
     ...user,
     password: hashed,
+    username: username ? username : email.split('@')[0],
   });
   if (!res) {
     return null;
@@ -107,14 +111,18 @@ export async function authorize(email, password) {
   const user = await User.findOne({
     where: { email },
   });
-  console.log('user', !!user, !!(await compare(password, user.password)));
-  if (!user || !(await compare(password, user.password))) {
+  
+  if (!user) {
     console.log("auth didn't work");
     return false;
   }
-  console.log('auth did work');
 
-  return user.dataValues;
+ if (await compare(password, user.password)) {
+   console.log('auth did work');
+   return user.dataValues;
+ }
+
+  return false;
 }
 
 // add cal to user

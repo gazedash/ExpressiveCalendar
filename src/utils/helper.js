@@ -19,6 +19,12 @@ export function getAssetsDir() {
   return path.resolve(__dirname, '../../assets/');
 }
 
+export function randomString() {
+  const time = new Date().getTime().toString();
+  const random = Math.floor(Math.random() * (100 - 5 + 1)) + 5;
+  return Buffer.from(random + time, 'ascii').toString('base64');
+}
+
 export function getContent(url) {
   // return new pending promise
   return new Promise((resolve, reject) => {

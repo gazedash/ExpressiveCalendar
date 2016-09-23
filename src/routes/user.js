@@ -47,12 +47,13 @@ export default (createRoute) => {
           },
         });
       } else {
-        res.json({ code: 200, success: true, payload: user });
+        res.json({ code: 200, success: true, payload: omit(user, 'password') });
       }
     },
   });
 
   // Update authorized profile
+  // TODO: refactor
   createRoute({
     method: 'POST',
     path: `${USER_ENDPOINT}`,
@@ -69,7 +70,7 @@ export default (createRoute) => {
           },
         });
       } else {
-        res.json({ code: 200, success: true, payload: user });
+        res.json({ code: 200, success: true, payload: omit(user, 'password') });
       }
     },
   });
@@ -182,6 +183,7 @@ export default (createRoute) => {
       },
     },
     async handler(req, res) {
+      // TODO: check user in db?
       const token = getToken(req);
       if (token) {
         const hashToken = hash(token);
@@ -208,7 +210,6 @@ export default (createRoute) => {
     auth: false,
     validation: {
       body: {
-        // TODO: default cases, is exist
         email: Joi.string()
           .min(USER_EMAIL_MIN_LENGTH)
           .max(USER_EMAIL_MAX_LENGTH)
@@ -246,7 +247,9 @@ export default (createRoute) => {
           username: user.username,
         });
         addGroupSchedule(req.body.group);
-        if (!user) {
+        if (user) {
+          res.status(200).json({ code: 200, success: true, token, payload: omit(user, 'password') });
+        } else {
           res.status(400).json({
             error: {
               success: false,
@@ -254,9 +257,6 @@ export default (createRoute) => {
               message: 'Bad request',
             },
           });
-        } else {
-          // res.status(200).json(user);
-          res.status(200).json({ code: 200, success: true, token, payload: omit(user, 'password') });
         }
       }
       res.status(400).json({

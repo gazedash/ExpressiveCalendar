@@ -1,5 +1,7 @@
 import { Calendar, User } from '../model/entity';
 import { UserRepository, EventRepository } from './index';
+import { PRIVACY_LEVEL_PRIVATE_DEFAULT } from "../enum/LogTypes";
+import { randomString } from "../utils/helper";
 
 export async function exists(slug) {
   const isExist = await Calendar.findOne({
@@ -23,7 +25,7 @@ export async function find(id) {
 }
 
 export async function findAll(email) {
-  const res = await Calendar.findAll({
+  const res = await Calendar.findAndCountAll({
     include: [{ model: User, where: { email }, attributes: ['email'], through: { attributes: [] } }],
     limit: 100,
   });
@@ -47,11 +49,22 @@ export async function findBySlug(slug) {
   return res;
 }
 
-export async function findByUserIdAndType({ userId, type }) {
-  const user = await UserRepository.find(userId);
+export async function findByUserIdAndSlug({ userId, slug }) {
+  const res = await Calendar.findOne({
+    include: [{ model: User, where: { id: userId }, attributes: ['email'], through: { attributes: [] } }],
+    where: { slug }
+  });
+
+  if (!res) {
+    return null;
+  }
+
+  return res;
+}
+
+export async function findAllByUserIdAndType({ userId, type }) {
   const res = await Calendar.findAndCountAll({
-    // TODO: fix
-    include: [user],
+    include: [{ model: User, where: { id: userId }, attributes: ['email'], through: { attributes: [] } }],
     where: { type },
   });
 
@@ -64,12 +77,21 @@ export async function findByUserIdAndType({ userId, type }) {
 
 export async function create(calendar) {
   console.log('calendar: create');
-  const { name, type, slug } = calendar;
+  const { slug, privacy } = calendar;
   const isExist = await exists(slug);
-  if (!name || !type || !slug || !calendar || isExist) {
+  if (!calendar || isExist) {
     return null;
   }
-  const res = await Calendar.create(calendar);
+
+  const random = randomString();
+  const dateTime = new Date().toUTCString();
+
+  const res = await Calendar.create({
+    ...calendar,
+    slug: slug ? slug : random,
+    name: name ? name : `${dateTime}`,
+    privacy: privacy ? privacy : PRIVACY_LEVEL_PRIVATE_DEFAULT,
+  });
   if (!res) {
     return null;
   }

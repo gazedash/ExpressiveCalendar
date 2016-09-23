@@ -57,7 +57,6 @@ export default (createRoute) => {
     path: `${CALENDAR_ENDPOINT}`,
     validation: {
       body: {
-        // TODO: default cases
         slug: Joi.string()
           .min(CALENDAR_SLUG_MIN_LENGTH)
           .max(CALENDAR_SLUG_MAX_LENGTH),
@@ -86,6 +85,7 @@ export default (createRoute) => {
 
   // Update calendar by slug
   createRoute({
+    // TODO: update event refactor
     method: 'PUT',
     path: `${CALENDAR_ENDPOINT}/:slug`,
     validation: {
@@ -135,11 +135,11 @@ export default (createRoute) => {
       },
     },
     async handler(req, res) {
-      // TODO: check that cal is yours
-      const calendar = await CalendarRepository.remove(req.body.slug);
+      const calendar = await CalendarRepository.findByUserIdAndSlug({slug: req.body.slug, userId: req.user.id});
       if (!calendar) {
         res.status(400).json({ code: 400, success: false, message: 'Calendar not found' });
       }
+      calendar.destroy();
       res.status(200).json({ code: 200, success: true, message: 'Calendar deleted' });
     },
   });
@@ -157,10 +157,11 @@ export default (createRoute) => {
       },
     },
     async handler(req, res) {
-      const calendar = await CalendarRepository.remove(req.params.slug);
+      const calendar = await CalendarRepository.findByUserIdAndSlug({slug: req.params.slug, userId: req.user.id});
       if (!calendar) {
         res.status(400).json({ code: 400, success: false, message: 'Calendar not found' });
       }
+      calendar.destroy();
       res.status(200).json({ code: 200, success: true, message: 'Calendar deleted' });
     },
   });
