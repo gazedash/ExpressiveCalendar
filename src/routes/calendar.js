@@ -12,6 +12,8 @@ import {
   CALENDAR_DESCRIPTION_MAX_LENGTH,
   CALENDAR_PRIVACY_MAX_LEVEL,
 } from '../config/rules';
+import * as et from '../enum/EnumTypes';
+import auth from '../utils/auth';
 
 export default (createRoute) => {
   // Get calendar index
@@ -47,7 +49,10 @@ export default (createRoute) => {
       if (!events) {
         res.status(400).json({ code: 400, success: false, message: 'No events found by slug' });
       }
-      res.status(200).json({ code: 200, success: true, payload: events });
+      if (events.privacy !== et.PRIVACY_LEVEL_PRIVATE) {
+        res.status(200).json({ code: 200, success: true, payload: events });
+      }
+      auth();
     },
   });
 
@@ -69,9 +74,9 @@ export default (createRoute) => {
         type: Joi.string()
           .min(CALENDAR_TYPE_MIN_LENGTH)
           .max(CALENDAR_TYPE_MAX_LENGTH),
-        privacy: Joi.number().integer()
-          .min(0)
-          .max(CALENDAR_PRIVACY_MAX_LEVEL),
+        privacy: Joi.string()
+          .min(CALENDAR_TYPE_MIN_LENGTH)
+          .max(CALENDAR_TYPE_MAX_LENGTH),
       },
     },
     async handler(req, res) {
@@ -135,7 +140,7 @@ export default (createRoute) => {
       },
     },
     async handler(req, res) {
-      const calendar = await CalendarRepository.findByUserIdAndSlug({slug: req.body.slug, userId: req.user.id});
+      const calendar = await CalendarRepository.findByUserIdAndSlug({ slug: req.body.slug, userId: req.user.id });
       if (!calendar) {
         res.status(400).json({ code: 400, success: false, message: 'Calendar not found' });
       }
@@ -157,7 +162,7 @@ export default (createRoute) => {
       },
     },
     async handler(req, res) {
-      const calendar = await CalendarRepository.findByUserIdAndSlug({slug: req.params.slug, userId: req.user.id});
+      const calendar = await CalendarRepository.findByUserIdAndSlug({ slug: req.params.slug, userId: req.user.id });
       if (!calendar) {
         res.status(400).json({ code: 400, success: false, message: 'Calendar not found' });
       }

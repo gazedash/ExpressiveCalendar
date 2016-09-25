@@ -1,6 +1,6 @@
 import logger from './logger';
 // import Promise from 'bluebird';
-import * as lt from '../enum/LogTypes';
+import * as et from '../enum/EnumTypes';
 import * as UserRepository from '../repositories/UserRepository';
 import * as LogRepository from '../repositories/LogRepository';
 import { isJson } from './helper';
@@ -30,10 +30,10 @@ export async function taskHandler(data, connectionParams) {
   const user = await UserRepository.findByUuid(id);
 
   const log = await LogRepository.create({
-    type: lt.USER_CONNECT,
+    type: et.USER_CONNECT,
     data: result,
   });
   await user.addLog(log);
 
-  return lt.USER_CONNECT;
+  return et.USER_CONNECT;
 }

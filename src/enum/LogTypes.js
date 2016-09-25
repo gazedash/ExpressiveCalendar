@@ -1,8 +1,0 @@
-export const USER_CONNECT = 'USER_CONNECT';
-export const USER_DISCONNECT = 'USER_DISCONNECT';
-export const USER_FIRST_CONNECT = 'USER_FIRST_CONNECT';
-
-export const PRIVACY_LEVEL_PUBLIC = 1;
-export const PRIVACY_LEVEL_LINK = 2;
-export const PRIVACY_LEVEL_GROUP = 3;
-export const PRIVACY_LEVEL_PRIVATE_DEFAULT = 4;

@@ -91,9 +91,6 @@ export async function create(user) {
     console.log('user: missing fields', user);
     return null;
   }
-  if (!username) {
-
-  }
   const hashed = await hash(password);
   const res = await User.create({
     ...user,
@@ -111,16 +108,16 @@ export async function authorize(email, password) {
   const user = await User.findOne({
     where: { email },
   });
-  
+
   if (!user) {
     console.log("auth didn't work");
     return false;
   }
 
- if (await compare(password, user.password)) {
-   console.log('auth did work');
-   return user.dataValues;
- }
+  if (await compare(password, user.password)) {
+    console.log('auth did work');
+    return user.dataValues;
+  }
 
   return false;
 }

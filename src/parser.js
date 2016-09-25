@@ -1,7 +1,7 @@
 import cheerio from 'cheerio';
 import _ from 'lodash';
 import moment from 'moment';
-import { getCurrentUrl } from './utils/schedule';
+import { getCurrentUrl, addGroupSchedule } from './utils/schedule';
 import { getContent } from './utils/helper';
 import {
   scheduleSelector,
@@ -143,6 +143,23 @@ export function getSchedule({ group, semester }) {
   groupCopy = latinToCyrillicGroupName(groupCopy);
   const url = getCurrentUrl({ group: groupCopy, semester: semesterCopy });
   return getContent(url).then((body) => getScheduleData(body));
+}
+
+export function getAllGroupsSchedule(list) {
+  const startTime = new Date();
+  console.log('Get All Groups Schedule', startTime);
+  for (let i = 0; i < list.length; i++) {
+    for (let course = 1; course <= 5; course++) {
+      if (list[i].match('м') && course > 2) {
+        break;
+      }
+      for (let groupNumber = 1; groupNumber <= 15; groupNumber++) {
+        const groupName = `${list[i]}${course}-${groupNumber}`;
+        addGroupSchedule(groupName);
+      }
+    }
+  }
+  console.log('END: Get All Groups Schedule', new Date() - startTime);
 }
 //
 // const url = getCurrentUrl({ group: 'КТбо1-5', semester: 1 });

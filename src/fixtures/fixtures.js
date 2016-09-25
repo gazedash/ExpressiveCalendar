@@ -1,59 +1,62 @@
 import sequelize from '../utils/sequelize';
 import { UserRepository, CalendarRepository, EventRepository } from '../repositories';
+import * as et from '../enum/EnumTypes';
 
 const dropDB = true;
 
-export function load() {
+export async function load() {
   const password = 'admin0';
 
-  for (let i = 0; i < 15; i++) {
-    UserRepository.create({
+  for (let i = 1; i <= 5; i++) {
+    const user = await UserRepository.create({
       firstname: `admin${i}`,
       surname: `admin${i}`,
       email: `admin${i}@ya.ru`,
       username: `admin${i}`,
       password,
-    }).then(user => {
-      const { id, email } = user;
-      UserRepository.exists(email).then(() => {
-        return UserRepository.authorize(email, password)
-          .then(data => console.log('auth', !!data));
+    });
+
+    const { email } = user;
+
+    if (await UserRepository.exists(email)) {
+      await UserRepository.authorize(email, password);
+    }
+
+    for (let j = 1; j <= 4; j++) {
+      const calendar = await CalendarRepository.create({
+        name: `My ${j} schedule`,
+        type: 'work',
+        slug: `work${i}${j}`,
       });
 
-      return id;
-    }).then(userId => {
-      for (let j = 0; j < 10; j++) {
-        CalendarRepository.create({
-          name: `My ${j} schedule`,
-          type: 'work',
-          slug: `work${j}`,
-        }, userId).then((calendar) => {
-          const { id, slug } = calendar;
-          console.log('id, userId', id, userId);
-          CalendarRepository.exists(slug).then(() => UserRepository.addCalendar(userId, j));
-          return id;
-        }).then(calId => {
-          console.log('calId', calId);
-          for (let k = 0; k < 10; k++) {
-            EventRepository.create({
-              name: `study${k}`,
-              slug: `study${k}`,
-              week: 'study',
-              weekday: 3,
-            }, calId).then((event) => {
-              const { id, name } = event;
-              console.log('name', name);
-              EventRepository.exists(name).then(() => CalendarRepository.addEvent(calId, id));
+      const { id, slug } = calendar;
+      console.log('userId, calId, j', i, id, j);
 
-              return id;
-            });
-          }
-        });
+      if (await CalendarRepository.exists(slug)) {
+        UserRepository.addCalendar(i, id);
       }
-    });
+
+      for (let k = 1; k <= 3; k++) {
+        const event = await EventRepository.create({
+          name: `study${k}`,
+          slug: `study${i}${j}${k}`,
+          week: 'study',
+          weekday: 3,
+          privacy: et.PRIVACY_LEVEL_PUBLIC,
+        });
+
+        const { id, name } = event;
+        console.log('evnet name', name);
+
+        if (await CalendarRepository.exists(slug)) {
+          CalendarRepository.addEvent(j, id);
+        }
+      }
+    }
   }
-  console.log('Fixtures have been loaded successfully');
 }
+
+console.log('Fixtures have been loaded successfully');
 
 sequelize
   .authenticate()

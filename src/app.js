@@ -6,6 +6,8 @@ import attachRoutes from './routes';
 import { sequelizeConnect } from './utils/sequelize';
 import { checkRedis } from './redis';
 import { load } from './fixtures/fixtures';
+import { addGroupSchedule } from './utils/schedule';
+import { groupList } from './config/schedule';
 
 const app = express();
 

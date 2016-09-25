@@ -1,7 +1,5 @@
 import { Event, Calendar, User } from '../model/entity';
 import { CalendarRepository } from './index';
-import {PRIVACY_LEVEL_PRIVATE_DEFAULT} from '../enum/LogTypes';
-import { randomString } from "../utils/helper";
 
 export async function exists(slug) {
   const isExist = await Event.findOne({
@@ -26,7 +24,7 @@ export async function findByUserIdAndSlug({ userId, slug }) {
   // TODO: test
   const res = await Event.findOne({
     include: [{ model: User, where: { id: userId }, attributes: ['email'], through: { attributes: [] } }],
-    where: { slug }
+    where: { slug },
   });
 
   if (!res) {
@@ -72,25 +70,17 @@ export async function findAllBySlug(slug) {
 }
 
 export async function create(event) {
-  console.log('event: create');
-  const { name, slug, privacy } = event;
+  const { slug } = event;
   const isExist = await findBySlug(slug);
   if (isExist) {
     return null;
   }
-  const random = randomString();
-  const dateTime = new Date().toUTCString();
-
-  const res = await Event.create({
-    ...event,
-    slug: slug ? slug : random,
-    name: name ? name : `${dateTime}`,
-    privacy: privacy ? privacy : PRIVACY_LEVEL_PRIVATE_DEFAULT,
-  });
+  const res = await Event.create(event);
   if (!res) {
     return null;
   }
 
+  console.log('event: create');
   return res;
 }
 

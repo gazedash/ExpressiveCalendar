@@ -28,3 +28,17 @@ export function getSemester() {
 }
 
 export const semester = getSemester();
+
+export const groupList = [
+  'КТбо',
+  'КТсо',
+  'КТмо',
+  'РТбо',
+  'РТбз',
+  'РТсо',
+  'РТмо',
+  'ЭПбо',
+  'ЭПмо',
+  'УЭбо',
+  'УЭмо',
+];

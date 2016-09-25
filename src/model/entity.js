@@ -1,6 +1,7 @@
 import Sequelize from 'sequelize';
 import sequelize from '../utils/sequelize';
-// import * as lt from '../enum/LogTypes';
+import * as et from '../enum/EnumTypes';
+import { randomString } from '../utils/helper';
 
 export const User = sequelize.define('user', {
   id: {
@@ -47,9 +48,9 @@ export const User = sequelize.define('user', {
 //     },
 //     type: {
 //         type: Sequelize.ENUM(
-//             lt.USER_CONNECT,
-//             lt.USER_DISCONNECT,
-//             lt.USER_FIRST_CONNECT,
+//             et.USER_CONNECT,
+//             et.USER_DISCONNECT,
+//             et.USER_FIRST_CONNECT,
 //         )
 //     },
 //     data: {
@@ -69,6 +70,7 @@ export const Calendar = sequelize.define('calendar', {
   },
   name: {
     type: Sequelize.STRING,
+    defaultValue: new Date().toUTCString(),
   },
   description: {
     type: Sequelize.STRING,
@@ -79,17 +81,27 @@ export const Calendar = sequelize.define('calendar', {
   slug: {
     type: Sequelize.STRING,
     unique: true,
+    defaultValue: randomString(),
   },
   privacy: {
-    type: Sequelize.INTEGER,
+    type: Sequelize.ENUM(
+      et.PRIVACY_LEVEL_PRIVATE,
+      et.PRIVACY_LEVEL_PUBLIC,
+      et.PRIVACY_LEVEL_LINK,
+      et.PRIVACY_LEVEL_GROUP,
+    ),
+    defaultValue: et.PRIVACY_LEVEL_PRIVATE,
   },
+  // privacy: {
+  //   type: Sequelize.INTEGER,
+  // },
 }, {
   charset: 'utf8',
   freezeTableName: true,
 });
 
-User.belongsToMany(Calendar, { through: 'user_calendar', onDelete: 'cascade' });
 Calendar.belongsToMany(User, { through: 'user_calendar' });
+User.belongsToMany(Calendar, { through: 'user_calendar', onDelete: 'cascade' });
 
 export const Event = sequelize.define('event', {
   id: {
@@ -99,10 +111,12 @@ export const Event = sequelize.define('event', {
   },
   name: {
     type: Sequelize.STRING,
+    defaultValue: new Date().toUTCString(),
   },
   slug: {
     type: Sequelize.STRING,
     unique: true,
+    defaultValue: randomString(),
   },
   weekInterval: {
     type: Sequelize.STRING,
@@ -128,6 +142,14 @@ export const Event = sequelize.define('event', {
   place: {
     type: Sequelize.STRING,
   },
+  oddEvenBoth: {
+    type: Sequelize.ENUM(
+      et.BOTH_WEEK,
+      et.ODD_WEEK,
+      et.EVEN_WEEK,
+    ),
+    defaultValue: et.BOTH_WEEK,
+  },
   // TODO: enum (0, 1, 2): 0 for both, 1 for odd, 2 for even
   isEven: {
     type: Sequelize.BOOLEAN,
@@ -139,13 +161,22 @@ export const Event = sequelize.define('event', {
     type: Sequelize.STRING,
   },
   privacy: {
-    type: Sequelize.INTEGER,
+    type: Sequelize.ENUM(
+      et.PRIVACY_LEVEL_PRIVATE,
+      et.PRIVACY_LEVEL_PUBLIC,
+      et.PRIVACY_LEVEL_LINK,
+      et.PRIVACY_LEVEL_GROUP,
+    ),
+    defaultValue: et.PRIVACY_LEVEL_PRIVATE,
   },
+  // privacy: {
+  //   type: Sequelize.INTEGER,
+  // },
 }, {
   charset: 'utf8',
   freezeTableName: true,
   // timestamps: false,
 });
 
-Event.belongsToMany(Calendar, { through: 'event_calendar' });
 Calendar.belongsToMany(Event, { through: 'event_calendar', onDelete: 'cascade' });
+Event.belongsToMany(Calendar, { through: 'event_calendar' });
