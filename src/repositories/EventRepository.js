@@ -1,5 +1,8 @@
 import { Event, Calendar, User } from '../model/entity';
 import { CalendarRepository } from './index';
+import * as et from '../enum/EnumTypes';
+import redis from '../redis';
+import { EVENT_PRIVACY_LEVEL } from '../config/redis';
 
 export async function exists(slug) {
   const isExist = await Event.findOne({
@@ -59,7 +62,7 @@ export async function findBySlug(slug) {
 
 export async function findAllBySlug(slug) {
   const res = await Event.findAndCountAll({
-    include: [{ model: Calendar, where: { slug }, attributes: ['slug'], through: { attributes: [] } }],
+    include: [{ model: Calendar, where: { slug }, attributes: ['slug', 'privacy'], through: { attributes: [] } }],
     limit: 100,
   });
   if (!res) {
@@ -70,7 +73,7 @@ export async function findAllBySlug(slug) {
 }
 
 export async function create(event) {
-  const { slug } = event;
+  const { slug, privacy } = event;
   const isExist = await findBySlug(slug);
   if (isExist) {
     return null;
@@ -80,6 +83,7 @@ export async function create(event) {
     return null;
   }
 
+  redis.hset(EVENT_PRIVACY_LEVEL, slug, privacy ? privacy : et.PRIVACY_LEVEL_PRIVATE);
   console.log('event: create');
   return res;
 }

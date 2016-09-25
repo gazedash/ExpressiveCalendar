@@ -7,10 +7,12 @@ import redis from '../redis';
 const Promise = require('bluebird');
 
 export function getToken(req) {
-  if (req.headers.authorization) {
-    const parts = req.headers.authorization.split(' ', 2);
-    if (parts[0].toLowerCase() === 'bearer') {
-      return parts[1];
+  if (req.headers) {
+    if (req.headers.authorization) {
+      const parts = req.headers.authorization.split(' ', 2);
+      if (parts[0].toLowerCase() === 'bearer') {
+        return parts[1];
+      }
     }
   }
 
@@ -28,6 +30,36 @@ function isBlacklisted(hashToken) {
   return Promise.all(blacklistChecks);
 }
 
+export function isAuthorized(req) {
+  let token;
+
+  if (req.headers) {
+    token = getToken(req);
+    console.log('token', token);
+  }
+  if (!token) {
+    return false;
+  }
+  return verify(token).then(
+    (payload) => UserRepository.find(payload.id),
+    () => {
+      return false;
+    }
+  ).then((user) => {
+    const hashToken = hash(token);
+    return isBlacklisted(hashToken).then((result) => {
+      if (user && !_.max(result)) {
+        req.user = user;
+        return true;
+      }
+
+      return false;
+    });
+  }).catch(() => {
+    return false;
+  });
+}
+
 export default () => {
   return function auth(req, res, next) {
     const token = getToken(req);
@@ -37,7 +69,7 @@ export default () => {
         success: false, code: 400, message: 'Token not found',
       })));
     }
-    verify(token).then(
+    return verify(token).then(
       (payload) => UserRepository.find(payload.id),
       () => {
         return next(res.status(401).json({

@@ -1,5 +1,8 @@
 import { Calendar, User } from '../model/entity';
 import { UserRepository, EventRepository } from './index';
+import * as et from '../enum/EnumTypes';
+import redis from '../redis';
+import { CALENDAR_PRIVACY_LEVEL } from '../config/redis';
 
 export async function exists(slug) {
   const isExist = await Calendar.findOne({
@@ -74,17 +77,19 @@ export async function findAllByUserIdAndType({ userId, type }) {
 }
 
 export async function create(calendar) {
-  const { slug } = calendar;
+  const { slug, privacy } = calendar;
   const isExist = await exists(slug);
   if (!calendar || isExist) {
     return null;
   }
 
   const res = await Calendar.create(calendar);
+
   if (!res) {
     return null;
   }
 
+  redis.hset(CALENDAR_PRIVACY_LEVEL, slug, privacy ? privacy : et.PRIVACY_LEVEL_PRIVATE);
   console.log('calendar: create');
   return res;
 }

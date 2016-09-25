@@ -4,6 +4,7 @@ import { getSchedule } from '../parser';
 import redis from '../redis';
 import { hash } from '../utils/crypto';
 import { transliterateGroupName } from './transliterate';
+import { GROUP_DATA, GROUP_HASH, GROUP_LIST } from '../config/redis';
 
 const Promise = require('bluebird');
 
@@ -27,12 +28,12 @@ export function getCurrentUrl({ group, semester }) {
 
 export function getGroupScheduleFromCache(group) {
   const groupName = transliterateGroupName(group).toLowerCase();
-  return redis.hgetAsync(groupName, 'data');
+  return redis.hgetAsync(GROUP_DATA, groupName);
 }
 
 export function shouldScheduleUpdate(group, hashNew) {
   const groupName = transliterateGroupName(group).toLowerCase();
-  return redis.hgetAsync(groupName, 'hash').then((hashOld) => {
+  return redis.hgetAsync(GROUP_HASH, groupName).then((hashOld) => {
     return hashNew !== hashOld;
   });
 }
@@ -43,13 +44,17 @@ export function addGroupSchedule(group) {
       if (data) {
         const groupName = transliterateGroupName(group).toLowerCase();
 
-        redis.sadd('group', groupName);
-        redis.hgetAsync(groupName, 'hash').then((hashOld) => {
+        redis.hgetAsync(GROUP_HASH, groupName).then((hashOld) => {
+          redis.sadd(GROUP_LIST, groupName);
           const dataJSON = JSON.stringify(data);
           const hashNew = hash(dataJSON);
 
           if (hashOld !== hashNew) {
-            redis.hmset(groupName, 'hash', hashNew, 'data', dataJSON);
+            // TODO: Rethink
+            redis.multi()
+              .hset(GROUP_HASH, groupName, hashNew)
+              .hset(GROUP_DATA, groupName, dataJSON)
+              .exec();
           }
         });
       }

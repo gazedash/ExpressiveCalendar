@@ -6,8 +6,6 @@ import attachRoutes from './routes';
 import { sequelizeConnect } from './utils/sequelize';
 import { checkRedis } from './redis';
 import { load } from './fixtures/fixtures';
-import { addGroupSchedule } from './utils/schedule';
-import { groupList } from './config/schedule';
 
 const app = express();
 
@@ -21,13 +19,13 @@ app.use(bodyParser.json({ limit: '3mb' }));
 
 attachRoutes(app);
 
-app.listen(API_PORT, () => {
-  console.log('Server listening at port %d', API_PORT, new Date());
-});
-
 app.use(cors({
   origin: '*',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
 }));
+
+app.listen(API_PORT, () => {
+  console.log('Server listening at port %d', API_PORT, new Date());
+});
 
 load();

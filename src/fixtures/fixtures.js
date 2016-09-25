@@ -27,6 +27,7 @@ export async function load() {
         name: `My ${j} schedule`,
         type: 'work',
         slug: `work${i}${j}`,
+        privacy: et.PRIVACY_LEVEL_PUBLIC,
       });
 
       const { id, slug } = calendar;

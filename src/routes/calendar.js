@@ -13,7 +13,9 @@ import {
   CALENDAR_PRIVACY_MAX_LEVEL,
 } from '../config/rules';
 import * as et from '../enum/EnumTypes';
-import auth from '../utils/auth';
+import redis from '../redis';
+import { isAuthorized } from '../utils/auth';
+import { CALENDAR_PRIVACY_LEVEL } from '../config/redis';
 
 export default (createRoute) => {
   // Get calendar index
@@ -44,15 +46,24 @@ export default (createRoute) => {
       },
     },
     async handler(req, res) {
-      // TODO: add private levels handling
-      const events = await EventRepository.findAllBySlug(req.params.slug);
-      if (!events) {
+      const privacy = await redis.hgetAsync(CALENDAR_PRIVACY_LEVEL, req.params.slug);
+
+      async function getEvents(slug) {
+        const events = await EventRepository.findAllBySlug(slug);
+        if (events) {
+          res.status(200).json({ code: 200, success: true, payload: events });
+        }
         res.status(400).json({ code: 400, success: false, message: 'No events found by slug' });
       }
-      if (events.privacy !== et.PRIVACY_LEVEL_PRIVATE) {
-        res.status(200).json({ code: 200, success: true, payload: events });
+
+      if (privacy === et.PRIVACY_LEVEL_PRIVATE) {
+        if (isAuthorized(req)) {
+          await getEvents(req.params.slug);
+        }
+        res.status(400).json({ code: 400, success: false, message: 'Not authorized' });
       }
-      auth();
+
+      getEvents(req.params.slug);
     },
   });
 
