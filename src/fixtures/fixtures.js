@@ -34,7 +34,7 @@ export async function load() {
       console.log('userId, calId, j', i, id, j);
 
       if (await CalendarRepository.exists(slug)) {
-        UserRepository.addCalendar(i, id);
+        await UserRepository.addCalendar(i, id);
       }
 
       for (let k = 1; k <= 3; k++) {
@@ -50,7 +50,7 @@ export async function load() {
         console.log('evnet name', name);
 
         if (await CalendarRepository.exists(slug)) {
-          CalendarRepository.addEvent(j, id);
+          await CalendarRepository.addEvent(j, id);
         }
       }
     }

@@ -127,9 +127,14 @@ export async function addCalendar(userId, calId) {
   // TODO: 1find or create?
   console.log('user: add cal');
   const calendar = await CalendarRepository.find(calId);
-  const user = await find(userId);
-  console.log('user, calendar', !!user, !!calendar);
-  user.addCalendar(calendar);
+  if (calendar) {
+    const user = await find(userId);
+    if (user) {
+      user.addCalendar(calendar);
+      console.log('user, calendar', !!user, !!calendar);
+      return calendar;
+    }
+  }
 
-  return calendar;
+  return null;
 }

@@ -93,9 +93,15 @@ export async function create(event) {
 export async function addCalendar(eventId, calId) {
   console.log('event: addCal to event');
   const event = await find(eventId);
-  const calendar = await CalendarRepository.find(calId);
-  console.log('event, cal', !!event, !!calendar);
-  event.addCalendar(calendar);
+  if (event) {
+    const calendar = await CalendarRepository.find(calId);
+    if (calendar) {
+      console.log('event, cal', !!event, !!calendar);
+      event.addCalendar(calendar);
 
-  return event;
+      return event;
+    }
+  }
+
+  return null;
 }

@@ -99,22 +99,32 @@ export async function create(calendar) {
 export async function addUser(calId, userId) {
   console.log('calendar: add user');
   const calendar = await find(calId);
-  const user = await UserRepository.find(userId);
-  console.log('calendar, user', !!calendar, !!user);
-  calendar.addUser(user);
+  if (calendar) {
+    const user = await UserRepository.find(userId);
+    if (user) {
+      console.log('calendar, user', !!calendar, !!user);
+      calendar.addUser(user);
+      return calendar;
+    }
+  }
 
-  return calendar;
+  return null;
 }
 
 // add event to existing cal
 export async function addEvent(calId, eventId) {
   console.log('calendar: add event');
   const calendar = await find(calId);
-  const event = await EventRepository.find(eventId);
-  console.log('calendar, event', !!calendar, !!event);
-  calendar.addEvent(event);
+  if (calendar) {
 
-  return event;
+    const event = await EventRepository.find(eventId);
+    if (event) {
+      console.log('calendar, event', !!calendar, !!event);
+      calendar.addEvent(event);
+      return event;
+    }
+  }
+  return null;
 }
 
 export async function update(data) {
