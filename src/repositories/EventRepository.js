@@ -63,7 +63,7 @@ export async function findBySlug(slug) {
 
 export async function findAllBySlug(slug) {
   const res = await Event.findAndCountAll({
-    include: [{ model: Calendar, where: { slug }, attributes: ['slug', 'privacy'], through: { attributes: [] } }],
+    include: [{ model: Calendar, where: { slug }, attributes: ['slug'], through: { attributes: [] } }],
     limit: 100,
   });
   if (!res) {
@@ -75,7 +75,7 @@ export async function findAllBySlug(slug) {
 
 export async function create(event) {
   const { slug, privacy } = event;
-  const isExist = await findBySlug(slug);
+  const isExist = await exists(slug);
   if (isExist) {
     return null;
   }

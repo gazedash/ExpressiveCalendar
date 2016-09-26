@@ -80,7 +80,6 @@ export const Calendar = sequelize.define('calendar', {
   },
   slug: {
     type: Sequelize.STRING,
-    unique: true,
     defaultValue: randomString(),
   },
   privacy: {
@@ -115,7 +114,6 @@ export const Event = sequelize.define('event', {
   },
   slug: {
     type: Sequelize.STRING,
-    unique: true,
     defaultValue: randomString(),
   },
   weekInterval: {
