@@ -3,6 +3,7 @@ import { CalendarRepository } from './index';
 import * as et from '../enum/EnumTypes';
 import redis from '../redis';
 import { EVENT_PRIVACY_LEVEL } from '../config/redis';
+import { randomString } from "../utils/helper";
 
 export async function exists(slug) {
   const isExist = await Event.findOne({
@@ -83,7 +84,7 @@ export async function create(event) {
     return null;
   }
 
-  redis.hset(EVENT_PRIVACY_LEVEL, slug, privacy ? privacy : et.PRIVACY_LEVEL_PRIVATE);
+  redis.hset(EVENT_PRIVACY_LEVEL, slug ? slug : randomString(), privacy ? privacy : et.PRIVACY_LEVEL_PRIVATE);
   console.log('event: create');
   return res;
 }
