@@ -22,6 +22,7 @@ attachRoutes(app);
 app.use(cors({
   origin: '*',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  preflightContinue: true,
 }));
 
 app.listen(API_PORT, () => {
