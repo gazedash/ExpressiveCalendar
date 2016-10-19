@@ -17,13 +17,13 @@ sequelizeConnect();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({ limit: '3mb' }));
 
-attachRoutes(app);
-
 app.use(cors({
   origin: '*',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   preflightContinue: true,
 }));
+
+attachRoutes(app);
 
 app.listen(API_PORT, () => {
   console.log('Server listening at port %d', API_PORT, new Date());
