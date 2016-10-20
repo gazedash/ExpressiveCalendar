@@ -41,7 +41,7 @@ export function isAuthorized(req) {
     return false;
   }
   return verify(token).then(
-    (payload) => UserRepository.find(payload.id),
+    payload => UserRepository.find(payload.id),
     () => {
       return false;
     }
@@ -70,7 +70,7 @@ export default () => {
       })));
     }
     return verify(token).then(
-      (payload) => UserRepository.find(payload.id),
+      payload => UserRepository.find(payload.id),
       () => {
         return next(res.status(401).json({
           success: false, code: 401, message: 'Malformed token',

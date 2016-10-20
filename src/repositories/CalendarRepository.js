@@ -3,7 +3,7 @@ import { UserRepository, EventRepository } from './index';
 import * as et from '../enum/EnumTypes';
 import redis from '../redis';
 import { CALENDAR_PRIVACY_LEVEL } from '../config/redis';
-import { randomString } from "../utils/helper";
+import { randomString } from '../utils/helper';
 
 export async function exists(slug) {
   const isExist = await Calendar.findOne({
@@ -116,7 +116,6 @@ export async function addEvent(calId, eventId) {
   console.log('calendar: add event');
   const calendar = await find(calId);
   if (calendar) {
-
     const event = await EventRepository.find(eventId);
     if (event) {
       console.log('calendar, event', !!calendar, !!event);

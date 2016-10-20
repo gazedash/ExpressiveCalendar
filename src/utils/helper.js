@@ -38,11 +38,11 @@ export function getContent(url) {
       // temporary data holder
       const body = [];
       // on every content chunk, push it to the data array
-      response.on('data', (chunk) => body.push(chunk));
+      response.on('data', chunk => body.push(chunk));
       // we are done, resolve promise with those joined chunks
       response.on('end', () => resolve(body.join('')));
     });
     // handle connection errors of the request
-    request.on('error', (err) => reject(err));
+    request.on('error', err => reject(err));
   });
 }

@@ -57,6 +57,7 @@ export default (createRoute) => {
       }
 
       if (privacy === et.PRIVACY_LEVEL_PRIVATE) {
+        // TODO: check if my...
         if (isAuthorized(req)) {
           await getEvents(req.params.slug);
         }

@@ -191,7 +191,7 @@ export default (createRoute) => {
         // TODO: consider whitelists
         const category = `blacklist${day}`;
         redis.sadd(category, hashToken);
-        redis.pttlAsync(category).then(result => {
+        redis.pttlAsync(category).then((result) => {
           if (result === -1) {
             // Set TTL in milliseconds
             redis.pexpire(category, USER_TOKEN_BLACKLIST_TTL);

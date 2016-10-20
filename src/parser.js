@@ -30,16 +30,16 @@ export function getScheduleData(body) {
     const rows = table.length ? table.find('tr') : null;
     const rowsExam = tableExam.length ? tableExam.find('tr') : null;
 
-    function getData(rows) {
-      if (rows) {
-        if ($(rows[0]).length) {
+    function getData(rowsData) {
+      if (rowsData) {
+        if ($(rowsData[0]).length) {
           const first = {};
           const second = {};
           let dayCounter = 0;
 
-          for (let i = 2; i < rows.length; i++) {
-            const current = rows[i];
-            const next = rows[i + 1];
+          for (let i = 2; i < rowsData.length; i++) {
+            const current = rowsData[i];
+            const next = rowsData[i + 1];
             const classes = $(current).children('td');
             const classesNext = $(next).children('td');
 
@@ -60,7 +60,7 @@ export function getScheduleData(body) {
 
               let evenClassCounter = 0;
               for (let j = 1; j < classes.length; j++) {
-                const timeInterval = $(rows[1]).children('td')[j].children[0].data;
+                const timeInterval = $(rowsData[1]).children('td')[j].children[0].data;
                 const currentClass = classes[j];
                 const currentClassElem = currentClass.children[0];
                 // flag that it is not even week
@@ -97,8 +97,14 @@ export function getScheduleData(body) {
 
               evenClassCounter = 0;
 
-              const dayName = dayCounter === 6 ? 'sunday' :
-                moment.weekdays()[dayCounter + 1].toLowerCase();
+              let dayName;
+
+                if (title.indexOf('.') > -1) {
+                  dayName = title;
+                } else {
+                  dayName = dayCounter === 6 ? 'sunday' :
+                    moment.weekdays()[dayCounter + 1].toLowerCase();
+                }
 
               first[dayName] = day;
               second[dayName] = dayEven;
@@ -142,7 +148,7 @@ export function getSchedule({ group, semester }) {
   let groupCopy = correctGroupNameCase(group);
   groupCopy = latinToCyrillicGroupName(groupCopy);
   const url = getCurrentUrl({ group: groupCopy, semester: semesterCopy });
-  return getContent(url).then((body) => getScheduleData(body));
+  return getContent(url).then(body => getScheduleData(body));
 }
 
 export function getAllGroupsSchedule(list) {

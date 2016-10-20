@@ -12,5 +12,7 @@ export const PRIVACY_LEVEL_PUBLIC = 'PUBLIC';
 export const PRIVACY_LEVEL_LINK = 'LINK';
 // Auth, only group of people (redis sets)
 export const PRIVACY_LEVEL_GROUP = 'GROUP';
-// Auth, only for user
+// Auth only
+export const PRIVACY_LEVEL_AUTH = 'AUTH';
+// Auth, only for user, default
 export const PRIVACY_LEVEL_PRIVATE = 'PRIVATE';

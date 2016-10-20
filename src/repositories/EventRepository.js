@@ -3,7 +3,7 @@ import { CalendarRepository } from './index';
 import * as et from '../enum/EnumTypes';
 import redis from '../redis';
 import { EVENT_PRIVACY_LEVEL } from '../config/redis';
-import { randomString } from "../utils/helper";
+import { randomString } from '../utils/helper';
 
 export async function exists(slug) {
   const isExist = await Event.findOne({

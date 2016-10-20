@@ -4,9 +4,9 @@ import auth from '../utils/auth';
 import validation from '../utils/validation';
 
 const routes = fs.readdirSync(__dirname)
-  .map((file) => path.join(__dirname, file))
-  .filter((file) => file !== __filename)
-  .map((file) => require(file));
+  .map(file => path.join(__dirname, file))
+  .filter(file => file !== __filename)
+  .map(file => require(file));
 
 function attachRoutes(app) {
   function createRoute(options) {

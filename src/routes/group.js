@@ -40,4 +40,6 @@ export default (createRoute) => {
       });
     },
   });
+
+  // TODO: post /api/group/(message): add message to redis
 };
