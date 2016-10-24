@@ -95,7 +95,7 @@ export async function create(user) {
   const res = await User.create({
     ...user,
     password: hashed,
-    username: username ? username : email.split('@')[0],
+    username: username ? username : email,
   });
   if (!res) {
     return null;

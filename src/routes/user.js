@@ -115,13 +115,22 @@ export default (createRoute) => {
       },
     },
     async handler(req, res) {
-      const user = await UserRepository.findByUsername(req.params.username);
+      let user = null;
+      if (req.params.username.indexOf('@') > -1) {
+        const email = req.params.username;
+        user = await UserRepository.findByEmail(email);
+        if (!user) {
+          user = await UserRepository.findByUsername(req.params.username)
+        }
+      } else {
+        user = await UserRepository.findByUsername(req.params.username)
+      }
       if (!user) {
         res.status(404).json({
           error: {
             success: false,
             code: '404',
-            message: 'No such username',
+            message: 'No such username or email',
           },
         });
       } else {
