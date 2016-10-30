@@ -120,10 +120,10 @@ export default (createRoute) => {
         const email = req.params.username;
         user = await UserRepository.findByEmail(email);
         if (!user) {
-          user = await UserRepository.findByUsername(req.params.username)
+          user = await UserRepository.findByUsername(req.params.username);
         }
       } else {
-        user = await UserRepository.findByUsername(req.params.username)
+        user = await UserRepository.findByUsername(req.params.username);
       }
       if (!user) {
         res.status(404).json({

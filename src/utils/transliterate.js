@@ -1,6 +1,5 @@
 const charCyrillicToLatinMap = {
   Ё: 'YO',
-  Й: 'I',
   Ц: 'TS',
   У: 'U',
   К: 'K',
@@ -13,7 +12,8 @@ const charCyrillicToLatinMap = {
   Х: 'H',
   Ъ: "'",
   ё: 'yo',
-  й: 'i',
+  й: 'y',
+  Й: 'Y',
   ц: 'ts',
   у: 'u',
   к: 'k',
@@ -40,6 +40,7 @@ const charCyrillicToLatinMap = {
   ы: 'i',
   в: 'v',
   а: 'a',
+  A: 'А',
   п: 'p',
   р: 'r',
   о: 'o',
@@ -67,6 +68,7 @@ const charCyrillicToLatinMap = {
   ю: 'yu',
 };
 const charLatinToCyrillic = {
+  A: 'А',
   YO: 'Ё',
   I: 'И',
   TS: 'Ц',
@@ -80,6 +82,8 @@ const charLatinToCyrillic = {
   Z: 'З',
   H: 'Х',
   "'": 'ь',
+  y: 'й',
+  Y: 'Й',
   yo: 'ё',
   i: 'и',
   ts: 'ц',
@@ -126,14 +130,18 @@ const charLatinToCyrillic = {
 };
 
 export function transliterate(word) {
-  return word.split('').map((char) => {
-    return charCyrillicToLatinMap[char] || char;
-  }).join('');
+  if (word) {
+    return word.split('').map((char) => {
+      return charCyrillicToLatinMap[char] || char;
+    }).join('');
+  }
+
+  return word;
 }
 
 export function transliterateGroupName(group) {
   if (group) {
-    if (!group.match(/[A-Za-z]+[0-9]-[0-9]/)) {
+    if (!group.match(/[A-Za-z]+.*/)) {
       return transliterate(group);
     }
   }
@@ -142,17 +150,20 @@ export function transliterateGroupName(group) {
 }
 
 export function latinToCyrillic(word) {
-  return word.split('').map((char) => {
-    return charLatinToCyrillic[char] || char;
-  }).join('');
+  if (word) {
+    return word.split('').map((char) => {
+      return charLatinToCyrillic[char] || char;
+    }).join('');
+  }
+
+  return word;
 }
 
 export function latinToCyrillicGroupName(group) {
   if (group) {
-    if (group.match(/[A-Za-z]+[0-9]-[0-9]/)) {
+    if (group.match(/[A-Za-z]+.*/)) {
       return latinToCyrillic(group);
     }
   }
-
-  return group;
+  return latinToCyrillic(group);
 }

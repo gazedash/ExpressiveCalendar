@@ -7,6 +7,10 @@ import {
 import { addGroupSchedule, getGroupScheduleFromCache, getCurrentUrl } from '../utils/schedule';
 import { getSchedule } from '../parser';
 import { semester } from '../config/schedule';
+import { latinToCyrillicGroupName } from '../utils/transliterate';
+import { latinToCyrillic } from '../utils/transliterate';
+import { correctGroupNameCase } from '../parser';
+import { getSemester } from '../config/schedule';
 
 export default (createRoute) => {
   // Get calendar by slug
@@ -23,18 +27,24 @@ export default (createRoute) => {
       },
     },
     async handler(req, res) {
-      addGroupSchedule(req.params.group);
-      return getGroupScheduleFromCache(req.params.group).then((cache) => {
+      const group = req.params.group.replace('_', ' ');
+      addGroupSchedule(group);
+      return getGroupScheduleFromCache(group).then((cache) => {
         if (cache) {
           return res.status(200).json({ code: 200, debugMsg: 'from cache', success: true, payload: JSON.parse(cache) });
         }
-        return getSchedule({ group: req.params.group, semester }).then((data) => {
+        return getSchedule({ group, semester }).then((data) => {
           if (data) {
             return res.status(200).json({ code: 200, success: true, payload: data });
           }
+
+          let groupCopy = correctGroupNameCase(group);
+          groupCopy = latinToCyrillic(groupCopy);
+          const url = getCurrentUrl({ group: groupCopy, semester: getSemester() });
+
           return res.status(400).json({
             code: 400, success: false, message: 'Schedule is unavailible for this group',
-            url: getCurrentUrl({ group: req.params.group, semester }), group: req.params.group,
+            url, group
           });
         });
       });

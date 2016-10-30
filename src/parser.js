@@ -11,6 +11,7 @@ import {
   getSemester,
 } from './config/schedule';
 import { latinToCyrillicGroupName } from './utils/transliterate';
+import { latinToCyrillic } from './utils/transliterate';
 
 // const group = 'КТбо1-5';
 
@@ -99,12 +100,12 @@ export function getScheduleData(body) {
 
               let dayName;
 
-                if (title.indexOf('.') > -1) {
-                  dayName = title;
-                } else {
-                  dayName = dayCounter === 6 ? 'sunday' :
+              if (title.indexOf('.') > -1) {
+                dayName = title;
+              } else {
+                dayName = dayCounter === 6 ? 'sunday' :
                     moment.weekdays()[dayCounter + 1].toLowerCase();
-                }
+              }
 
               first[dayName] = day;
               second[dayName] = dayEven;
@@ -133,8 +134,14 @@ export function getScheduleData(body) {
 }
 
 export function correctGroupNameCase(group) {
-  if (group) {
+  if (group.indexOf('-') > -1) {
     return group.substr(0, 2).toUpperCase() + group.substr(2).toLowerCase();
+  }
+
+  if (group.indexOf(' ') > -1) {
+    const rest = group.substr(1, group.length - 5).toLowerCase() + group.substr(-4, group.length).toUpperCase();
+
+    return group[0].toUpperCase() + rest;
   }
 
   return group;
@@ -146,7 +153,7 @@ export function getSchedule({ group, semester }) {
     semesterCopy = getSemester();
   }
   let groupCopy = correctGroupNameCase(group);
-  groupCopy = latinToCyrillicGroupName(groupCopy);
+  groupCopy = latinToCyrillic(groupCopy);
   const url = getCurrentUrl({ group: groupCopy, semester: semesterCopy });
   return getContent(url).then(body => getScheduleData(body));
 }
