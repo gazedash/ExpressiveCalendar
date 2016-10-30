@@ -2,7 +2,7 @@ import sequelize from '../utils/sequelize';
 import { UserRepository, CalendarRepository, EventRepository } from '../repositories';
 import * as et from '../enum/EnumTypes';
 
-const dropDB = true;
+const dropDB = false;
 
 export async function load() {
   const password = 'admin0';
